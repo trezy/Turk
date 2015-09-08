@@ -9,7 +9,17 @@ module.exports = {
   ],
 
   buildCSS: [
-    'clean',
-    'sass'
+    'clean:css',
+    'buildAppCSS',
+    'buildThemesCSS'
+  ],
+
+  buildAppCSS: [
+    'sass:app'
+  ],
+
+  buildThemesCSS: [
+    'sass:themes',
+    'copy:themeAssets'
   ]
 }

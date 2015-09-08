@@ -4,12 +4,21 @@ module.exports = {
     interrupt: true
   },
 
-  sass: {
+  sassApp: {
     files: [
-      'scss/**/*.scss'
+      'scss/app/**/*.scss'
     ],
     tasks: [
-      'sass'
+      'buildAppCSS'
+    ]
+  },
+
+  sassThemes: {
+    files: [
+      'scss/themes/**/*.scss'
+    ],
+    tasks: [
+      'buildThemesCSS'
     ]
   }
 }
