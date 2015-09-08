@@ -1,0 +1,12 @@
+.chat-rail {
+  align-content: stretch;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 20rem;
+
+  .user-list, .server-list {
+    overflow: auto;
+  }
+}

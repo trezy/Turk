@@ -1,0 +1,11 @@
+.user-list {
+  flex-grow: 1;
+  flex-shrink: 1;
+
+  .user {
+    //overflow: hidden;
+    //text-overflow: ellipsis;
+    //white-space: nowrap;
+    word-wrap: break-word;
+  }
+}
