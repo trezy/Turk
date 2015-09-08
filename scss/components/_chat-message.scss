@@ -1,6 +1,6 @@
 .chat-message {
   display: flex;
-  flex-wrap: wrap;
+  //flex-wrap: wrap;
   width: 100%;
 
   .user {
@@ -9,7 +9,10 @@
     flex-shrink: 0;
     font-weight: bold;
     min-width: 10rem;
+    overflow: hidden;
     padding-right: 2rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .message {

@@ -1,3 +1,7 @@
 .server-list {
+  flex-grow: 1;
+  flex-shrink: 0;
+  max-height: 50vh;
+  overflow: auto;
   padding: 2rem;
 }
