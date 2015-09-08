@@ -1,9 +1,10 @@
-var App, document, EventEmitter, util;
+var _, App, document, EventEmitter, util;
 
 
 
 
 
+_ = require( 'lodash' );
 EventEmitter = require( 'events' ).EventEmitter;
 util = require( 'util' )
 
@@ -39,16 +40,20 @@ App.prototype.addChannel = function addChannel ( serverName, channelName ) {
 
   var channelElement, channelListElement;
 
-  channelListElement = this.ui.serverList.querySelector( '[data-server-name="' + serverName + '"] .channel-list' );
+  channelListElement = this.ui.serverList.querySelector( '[data-server="' + serverName + '"] .channel-list' );
 
-  if ( channelListElement.querySelector( '[data-channel-name="' + channelName + '"]' ) ) {
+  if ( channelListElement.querySelector( '[data-channel="' + channelName + '"]' ) ) {
     return;
   }
 
   channelElement = document.createElement( 'li' );
-  channelElement.setAttribute( 'data-channel-name', channelName );
-  channelElement.innerHTML = channelName;
+  channelElement.setAttribute( 'data-channel', channelName );
 
+  anchorElement = document.createElement( 'a' );
+  anchorElement.setAttribute( 'href', '#/' + serverName + '/' + channelName.substring( 1 ) );
+  anchorElement.innerHTML = channelName;
+
+  channelElement.appendChild( anchorElement );
   channelListElement.appendChild( channelElement );
 }
 
@@ -92,10 +97,10 @@ App.prototype.addServer = function addServer ( serverObject ) {
 
   var serverElement;
 
-  if ( ! this.ui.userList.querySelector( '[data-server-name="' + serverObject.name + '"]' ) ) {
+  if ( ! this.ui.userList.querySelector( '[data-server="' + serverObject.name + '"]' ) ) {
 
     serverElement = document.createElement( 'li' );
-    serverElement.setAttribute( 'data-server-name', serverObject.name );
+    serverElement.setAttribute( 'data-server', serverObject.name );
 
     checkboxElement = document.createElement( 'input' );
     checkboxElement.classList.add( 'hidden' );
@@ -169,7 +174,31 @@ App.prototype.bindEvents = function bindEvents () {
 
   self = this;
 
+  window.addEventListener( 'popstate', function ( event ) {
+    console.log( 'event', event );
+    console.log( 'window.location', window.location );
+  });
+
+  window.addEventListener( 'click', function ( event ) {
+
+    var channel, temporaryArray, server, target;
+
+    target = event.target;
+
+    if ( target.localName === 'a' ) {
+      event.preventDefault();
+
+      temporaryArray = target.hash.substring( 2 ).split( '/' );
+
+      serverName = temporaryArray[0];
+      channelName = '#' + temporaryArray[1];
+
+      self.switchChannel( self.servers[serverName], channelName );
+    }
+  });
+
   this.ui.chatMessageInput.addEventListener( 'keyup', function ( event ) {
+
     var channel, message, server;
 
     if ( event.keyCode === 13 ) {
@@ -194,6 +223,7 @@ App.prototype.bindEvents = function bindEvents () {
   });
 
   this.irc.addListener( 'names', function ( serverObject, channelName, nicknames ) {
+
     var keys;
 
     keys = Object.keys( nicknames );
@@ -311,10 +341,8 @@ App.prototype.switchChannel = function switchChannel ( serverObject, channelName
     messageChannel = chatMessage.getAttribute( 'data-channel' );
 
     if ( messageServer === this.currentServer.name && messageChannel === this.currentChannel ) {
-      console.log( 'Match!', chatMessage )
       chatMessage.classList.remove( 'hidden' );
     } else {
-      console.log( 'No Match!', chatMessage )
       chatMessage.classList.add( 'hidden' );
     }
   }
