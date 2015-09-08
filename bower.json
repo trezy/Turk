@@ -1,0 +1,19 @@
+{
+  "name": "trezy-irc",
+  "version": "0.1.0",
+  "description": "",
+  "authors": [
+    "Trezy <tre@trezy.com>"
+  ],
+  "dependencies": {
+    "backbone.marionette": "~2.4.2"
+  },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
