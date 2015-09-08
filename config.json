@@ -1,0 +1,15 @@
+{
+  "defaultServers": [
+    {
+      "address": "irc.ca.us.mibbit.net",
+      "channels": [
+        "#trezy2",
+        "#trezy"
+      ],
+      "name": "Mibbit",
+      "user": {
+        "nickname": "trezy-test"
+      }
+    }
+  ]
+}

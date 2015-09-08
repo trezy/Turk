@@ -1,0 +1,31 @@
+* {
+  box-sizing: border-box;
+}
+
+:root, html, body {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+}
+
+html {
+  font-family: Helvetica;
+  font-size: 10px;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 100;
+  overflow: hidden;
+
+}
+
+body {
+  font-size: 16px;
+  display: flex;
+}
+
+main {
+  align-content: stretch;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}

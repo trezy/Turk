@@ -1,0 +1,19 @@
+.chat-message {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+
+  .user {
+    flex-basis: 15vw;
+    flex-grow: 0;
+    flex-shrink: 0;
+    font-weight: bold;
+    min-width: 10rem;
+    padding-right: 2rem;
+  }
+
+  .message {
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+}
