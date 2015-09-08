@@ -19,12 +19,13 @@ html {
 }
 
 body {
-  font-size: 16px;
   display: flex;
+  font-size: 16px;
 }
 
 main {
   align-content: stretch;
+  align-self: stretch;
   display: flex;
   flex-direction: column;
   flex-grow: 1;

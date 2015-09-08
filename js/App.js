@@ -72,6 +72,7 @@ App.prototype.addMessage = function addMessage ( nickname, message, serverObject
 
   nicknameElement = document.createElement( 'div' );
   nicknameElement.classList.add( 'user' );
+  nicknameElement.setAttribute( 'data-nickname', nickname );
   nicknameElement.innerHTML = nickname;
 
   messageElement = document.createElement( 'p' );
@@ -149,17 +150,24 @@ App.prototype.addSystemMessage = function addSystemMessage ( message, serverObje
 
 
 
-App.prototype.addUser = function addUser ( nickname ) {
+App.prototype.addUser = function addUser ( nickname, serverName, channelName ) {
 
   var userElement;
 
-  if ( this.ui.userList.querySelector( '[data-nickname="' + nickname + '"]' ) ) {
+  if ( this.ui.userList.querySelector( '[data-nickname="' + nickname + '"][data-server="' + serverName + '"][data-channel="' + channelName + '"]' ) ) {
     return;
   }
 
   userElement = document.createElement( 'li' );
+  userElement.classList.add( 'user' );
   userElement.setAttribute( 'data-nickname', nickname );
+  userElement.setAttribute( 'data-server', serverName );
+  userElement.setAttribute( 'data-channel', channelName );
   userElement.innerHTML = nickname;
+
+  if ( serverName !== this.currentServer.name || channelName !== this.currentChannel ) {
+    userElement.classList.add( 'hidden' );
+  }
 
   this.ui.userList.appendChild( userElement );
 }
@@ -181,7 +189,7 @@ App.prototype.bindEvents = function bindEvents () {
 
   window.addEventListener( 'click', function ( event ) {
 
-    var channel, temporaryArray, server, target;
+    var channel, nickname, server, target, temporaryArray;
 
     target = event.target;
 
@@ -194,6 +202,15 @@ App.prototype.bindEvents = function bindEvents () {
       channelName = '#' + temporaryArray[1];
 
       self.switchChannel( self.servers[serverName], channelName );
+
+    } else if ( nickname = target.getAttribute( 'data-nickname' ) ) {
+      newValue = self.ui.chatMessageInput.value;
+
+      if ( newValue.substring( newValue.length - 1 ) !== ' ' ) {
+        newValue = newValue + ' ';
+      }
+
+      self.ui.chatMessageInput.value = newValue + nickname + ' ';
     }
   });
 
@@ -214,7 +231,7 @@ App.prototype.bindEvents = function bindEvents () {
   this.irc.addListener( 'registered', function ( serverObject, message ) {});
 
   this.irc.addListener( 'join', function ( serverObject, channelName, nickname ) {
-    self.addUser( nickname );
+    self.addUser( nickname, serverObject.name, channelName );
     self.addSystemMessage( nickname + ' joined ' + channelName, serverObject, channelName );
   });
 
@@ -229,12 +246,16 @@ App.prototype.bindEvents = function bindEvents () {
     keys = Object.keys( nicknames );
 
     for ( var i = 0; i < keys.length; i++ ) {
-      self.addUser( keys[i] );
+      var nickname;
+
+      nickname = keys[i];
+
+      self.addUser( nickname, serverObject.name, channelName );
     }
   });
 
   this.irc.addListener( 'part', function ( serverObject, channelName, nickname, reason ) {
-    self.removeUser( nickname );
+    self.removeUser( nickname, serverObject.name, channelName );
     self.addSystemMessage( nickname + ' left ' + channelName, serverObject, channelName );
   });
 
@@ -326,12 +347,13 @@ App.prototype.scrollToBottom = function scrollToBottom () {
 
 
 App.prototype.switchChannel = function switchChannel ( serverObject, channelName ) {
-  var chatMessages;
+  var chatMessages, userList;
 
   this.currentServer = serverObject || this.currentServer;
   this.currentChannel = channelName || this.currentChannel;
 
   chatMessages = this.ui.chat.querySelectorAll( '.chat-message' );
+  users = this.ui.userList.querySelectorAll( '.user' );
 
   for ( var i = 0; i < chatMessages.length; i++ ) {
     var chatMessage, server, channel;
@@ -344,6 +366,20 @@ App.prototype.switchChannel = function switchChannel ( serverObject, channelName
       chatMessage.classList.remove( 'hidden' );
     } else {
       chatMessage.classList.add( 'hidden' );
+    }
+  }
+
+  for ( var i = 0; i < users.length; i++ ) {
+    var user, server, channel;
+
+    user = users[i];
+    userServer = user.getAttribute( 'data-server' );
+    userChannel = user.getAttribute( 'data-channel' );
+
+    if ( userServer === this.currentServer.name && userChannel === this.currentChannel ) {
+      user.classList.remove( 'hidden' );
+    } else {
+      user.classList.add( 'hidden' );
     }
   }
 
