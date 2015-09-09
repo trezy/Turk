@@ -1,6 +1,8 @@
-:root, html, body {
-  background: black;
-  color: $font-color;
-  font-family: $font-family;
-  text-transform: uppercase;
-}
+:root, html, body {}
+
+body {
+  background-color: black;
+  color: $default-font-color;
+  font-family: $default-font-family;
+  font-size: $default-font-size;
+};

@@ -1,0 +1,55 @@
+.panel {
+  border-color: rgba( $orange, 0.5 );
+  border-radius: 1px;
+  border-style: solid;
+  border-width: 1px;
+  border-top-width: 3px;
+  margin: $default-gutter;
+  position: relative;
+  transition-duration: $default-animation-speed;
+  transition-property: border-top-color;
+
+  &:after,
+  &:before {
+    content: '';
+    display: block;
+    left: 0;
+    position: absolute;
+    right: 0;
+    transition: opacity $default-animation-speed;
+  }
+
+  &:after {
+    background-image:
+      radial-gradient(
+        ellipse 60% 100% at 50% 100%,
+        rgba( $orange, 0.3 ),
+        rgba( $orange, 0 )
+      );
+    bottom: 0;
+    height: 40%;
+    opacity: 0;
+  }
+
+  &:before {
+    background-image:
+      radial-gradient(
+        ellipse 80% 100% at 50% 0,
+        rgba( $orange, 0.5 ) 30%,
+        rgba( $orange, 0 )
+      );
+    height: 40%;
+    opacity: 0;
+    top: 0;
+  }
+
+  &:hover,
+  &:focus {
+    border-top-color: rgba( $orange, 1 );
+
+    &:after,
+    &:before {
+      opacity: 1;
+    }
+  }
+}

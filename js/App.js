@@ -47,6 +47,7 @@ App.prototype.addChannel = function addChannel ( serverName, channelName ) {
   }
 
   channelElement = document.createElement( 'li' );
+  channelElement.classList.add( 'fade-in' );
   channelElement.setAttribute( 'data-channel', channelName );
 
   anchorElement = document.createElement( 'a' );
@@ -101,6 +102,7 @@ App.prototype.addServer = function addServer ( serverObject ) {
   if ( ! this.ui.userList.querySelector( '[data-server="' + serverObject.name + '"]' ) ) {
 
     serverElement = document.createElement( 'li' );
+    serverElement.classList.add( 'fade-in' );
     serverElement.setAttribute( 'data-server', serverObject.name );
 
     checkboxElement = document.createElement( 'input' );
@@ -159,7 +161,7 @@ App.prototype.addUser = function addUser ( nickname, serverName, channelName ) {
   }
 
   userElement = document.createElement( 'li' );
-  userElement.classList.add( 'user' );
+  userElement.classList.add( 'user', 'fade-in' );
   userElement.setAttribute( 'data-nickname', nickname );
   userElement.setAttribute( 'data-server', serverName );
   userElement.setAttribute( 'data-channel', channelName );
@@ -232,7 +234,7 @@ App.prototype.bindEvents = function bindEvents () {
 
   this.irc.addListener( 'join', function ( serverObject, channelName, nickname ) {
     self.addUser( nickname, serverObject.name, channelName );
-    self.addSystemMessage( nickname + ' joined ' + channelName, serverObject, channelName );
+    self.addSystemMessage( '<span data-nickname="' + nickname + '">' + nickname + '</span> joined ' + channelName, serverObject, channelName );
   });
 
   this.irc.addListener( 'message', function ( serverObject, nickname, channelName, message ) {
