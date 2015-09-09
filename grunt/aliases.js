@@ -15,11 +15,13 @@ module.exports = {
   ],
 
   buildAppCSS: [
-    'sass:app'
+    'sass:app',
+    'autoprefixer:app'
   ],
 
   buildThemesCSS: [
     'sass:themes',
+    'autoprefixer:themes',
     'copy:themeAssets'
   ]
 }

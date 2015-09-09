@@ -1,0 +1,40 @@
+@-webkit-keyframes flicker {
+  0% {
+    opacity: 0;
+  }
+
+  2% {
+    opacity: 0.5;
+  }
+
+  10% {
+    opacity: 0.2;
+  }
+
+  20% {
+    opacity: 0.7;
+  }
+
+  22% {
+    opacity: 0.2;
+  }
+
+  24% {
+    opacity: 0.8;
+  }
+
+  30% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.flicker {
+  animation-name: flicker;
+  animation-duration: 1s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
