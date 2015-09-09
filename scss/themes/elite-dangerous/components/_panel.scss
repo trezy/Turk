@@ -17,6 +17,7 @@
     position: absolute;
     right: 0;
     transition: opacity $default-animation-speed;
+    z-index: -1;
   }
 
   &:after {

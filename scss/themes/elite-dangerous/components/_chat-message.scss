@@ -1,14 +1,6 @@
 .chat-message {
-  margin: $default-gutter 0;
+  margin-bottom: $default-gutter;
   padding: $default-gutter;
-
-  &:first-child {
-    margin-top: 0;
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
 
   .user {}
 
