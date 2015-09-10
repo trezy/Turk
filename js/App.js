@@ -191,7 +191,7 @@ App.prototype.bindEvents = function bindEvents () {
     } else if ( nickname = target.getAttribute( 'data-nickname' ) ) {
       newValue = self.ui.chatMessageInput.value;
 
-      if ( newValue.substring( newValue.length - 1 ) !== ' ' ) {
+      if ( newValue && newValue.substring( newValue.length - 1 ) !== ' ' ) {
         newValue = newValue + ' ';
       }
 
