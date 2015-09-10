@@ -5,8 +5,11 @@ module.exports = {
   ],
 
   build: [
-    'buildCSS'
+    'buildCSS',
+    'buildJS'
   ],
+
+  buildJS: [],
 
   buildCSS: [
     'clean:css',

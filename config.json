@@ -1,7 +1,8 @@
 {
-  "defaultServers": [
+  "servers": [
     {
       "address": "irc.ca.us.mibbit.net",
+      "autoconnect": true,
       "channels": [
         "#trezy2",
         "#trezy"

@@ -1,4 +1,4 @@
-var App, app, IRC, irc;
+var App, app, gui, initializeMenu, IRC, irc;
 
 
 
@@ -6,6 +6,7 @@ var App, app, IRC, irc;
 
 App = require( './js/App.js' );
 IRC = require( './js/IRC.js' );
+gui = require( 'nw.gui' );
 
 
 
@@ -13,3 +14,5 @@ IRC = require( './js/IRC.js' );
 
 irc = new IRC();
 app = new App( irc, document );
+
+app.buildMenu( gui );

@@ -12,13 +12,7 @@ util = require( 'util' )
 
 
 
-IRC = function () {
-  this.config = require( '../config.json' );
-
-  this.servers = {};
-
-  this.initialize();
-}
+IRC = function () {}
 
 
 
@@ -30,13 +24,7 @@ util.inherits( IRC, EventEmitter );
 
 
 
-IRC.prototype.bindEvents = function bindEvents () {}
-
-
-
-
-
-IRC.prototype.bindServerEvents = function bindServerEvents ( serverObject ) {
+IRC.prototype.bindEvents = function bindEvents ( serverObject ) {
 
   var self;
 
@@ -92,9 +80,9 @@ IRC.prototype.connectServer = function connectServer ( serverObject ) {
     channels: channels
   });
 
-  this.bindServerEvents( serverObject );
+  this.bindEvents( serverObject );
 
-  this.servers[serverObject.name] = serverObject;
+  return serverObject;
 }
 
 
@@ -107,7 +95,7 @@ IRC.prototype.connectChannel = function connectChannel ( server, channel ) {}
 
 
 
-IRC.prototype.disconnectServer = function connectServer ( serverObject ) {
+IRC.prototype.disconnectServer = function disconnectServer ( serverObject ) {
 
   var message;
 
@@ -115,7 +103,7 @@ IRC.prototype.disconnectServer = function connectServer ( serverObject ) {
 
   serverObject.server.disconnect( message );
 
-  this.bindServerEvents( serverObject );
+  this.bindEvents( serverObject );
 
   delete this.servers[serverObject.name];
 }
@@ -124,23 +112,7 @@ IRC.prototype.disconnectServer = function connectServer ( serverObject ) {
 
 
 
-IRC.prototype.initialize = function initialize () {
-
-  // Connect to default servers
-  for ( var i = 0; i < this.config.defaultServers.length; i++ ) {
-    var server;
-
-    server = this.config.defaultServers[i];
-
-    this.connectServer( server );
-  }
-}
-
-
-
-
-
-IRC.prototype.unbindServerEvents = function unbindServerEvents ( serverObject ) {
+IRC.prototype.unbindEvents = function unbindEvents ( serverObject ) {
   serverObject.server.removeAllListeners();
 }
 

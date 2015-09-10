@@ -1,0 +1,8 @@
+<li class="chat-message fade-in{{#if hidden }} hidden{{/if}}{{#unless nickname}} system-message{{/unless}}" data-server="{{ serverName }}" data-channel="{{ channelName }}">
+  {{#if nickname}}
+    <div class="user" data-nickname="{{ nickname }}">{{ nickname }}</div>
+    <p class="message">{{ message }}</p>
+  {{else}}
+    {{{ message }}}
+  {{/if}}
+</li>

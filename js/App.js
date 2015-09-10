@@ -1,4 +1,4 @@
-var _, App, document, EventEmitter, util;
+var _, App, document, EventEmitter, fs, Handlebars, util;
 
 
 
@@ -6,7 +6,9 @@ var _, App, document, EventEmitter, util;
 
 _ = require( 'lodash' );
 EventEmitter = require( 'events' ).EventEmitter;
-util = require( 'util' )
+fs = require( 'fs' );
+Handlebars = require( 'handlebars' );
+util = require( 'util' );
 
 
 
@@ -17,10 +19,13 @@ App = function ( irc, doc ) {
   document = doc;
 
   this.irc = irc;
+  this.config = require( '../config.json' );
   this.currentChannel = null;
   this.currentNickname = null;
   this.currentServer = null;
-  this.servers = this.irc.servers;
+  this.menu = null;
+  this.servers = {};
+  this.templates = {};
   this.ui = {};
 
   this.initialize();
@@ -38,56 +43,44 @@ util.inherits( App, EventEmitter );
 
 App.prototype.addChannel = function addChannel ( serverName, channelName ) {
 
-  var channelElement, channelListElement;
+  var channelList;
 
-  channelListElement = this.ui.serverList.querySelector( '[data-server="' + serverName + '"] .channel-list' );
+  if ( ! this.currentChannel ) {
+    this.currentChannel = channelName;
+  }
 
-  if ( channelListElement.querySelector( '[data-channel="' + channelName + '"]' ) ) {
+  channelList = this.ui.serverList.querySelector( '[data-server="' + serverName + '"] .channel-list' );
+
+  if ( channelList.querySelector( '[data-channel="' + channelName + '"]' ) ) {
     return;
   }
 
-  channelElement = document.createElement( 'li' );
-  channelElement.classList.add( 'fade-in' );
-  channelElement.setAttribute( 'data-channel', channelName );
-
-  anchorElement = document.createElement( 'a' );
-  anchorElement.setAttribute( 'href', '#/' + serverName + '/' + channelName.substring( 1 ) );
-  anchorElement.innerHTML = channelName;
-
-  channelElement.appendChild( anchorElement );
-  channelListElement.appendChild( channelElement );
+  channelList.appendChild( this.renderTemplate( 'channel-list-item', {
+    serverName: serverName,
+    safeName: channelName.substring( 1 ),
+    name: channelName
+  }));
 }
 
 
 
 
 
-App.prototype.addMessage = function addMessage ( nickname, message, serverObject, channelName ) {
+App.prototype.addMessage = function addMessage ( nickname, message, serverName, channelName ) {
 
-  var channel, container, message, messageElement, nickname, reason;
+  var chat, hidden;
 
-  container = document.createElement( 'li' );
-  container.classList.add( 'chat-message', 'fade-in' );
-  container.setAttribute( 'data-server', serverObject.name );
-  container.setAttribute( 'data-channel', channelName );
+  chat = this.ui.chat;
+  hidden = serverName !== this.currentServer.name || channelName !== this.currentChannel;
 
-  nicknameElement = document.createElement( 'div' );
-  nicknameElement.classList.add( 'user' );
-  nicknameElement.setAttribute( 'data-nickname', nickname );
-  nicknameElement.innerHTML = nickname;
+  chat.appendChild( this.renderTemplate( 'chat-message', {
+    serverName: serverName,
+    channelName: channelName,
+    nickname: nickname,
+    message: message,
+    hidden: hidden
+  }));
 
-  messageElement = document.createElement( 'p' );
-  messageElement.classList.add( 'message' );
-  messageElement.innerHTML = message;
-
-  container.appendChild( nicknameElement );
-  container.appendChild( messageElement );
-
-  if ( serverObject.name !== this.currentServer.name || channelName !== this.currentChannel ) {
-    container.classList.add( 'hidden' );
-  }
-
-  this.ui.chat.appendChild( container );
   this.scrollToBottom();
 }
 
@@ -97,31 +90,32 @@ App.prototype.addMessage = function addMessage ( nickname, message, serverObject
 
 App.prototype.addServer = function addServer ( serverObject ) {
 
-  var serverElement;
+  var serverList;
 
-  if ( ! this.ui.userList.querySelector( '[data-server="' + serverObject.name + '"]' ) ) {
+  serverList = this.ui.serverList;
 
-    serverElement = document.createElement( 'li' );
-    serverElement.classList.add( 'fade-in' );
-    serverElement.setAttribute( 'data-server', serverObject.name );
+  if ( ! serverList.querySelector( '[data-server="' + serverObject.name + '"]' ) ) {
 
-    checkboxElement = document.createElement( 'input' );
-    checkboxElement.classList.add( 'hidden' );
-    checkboxElement.setAttribute( 'type', 'checkbox' );
-    checkboxElement.setAttribute( 'id', 'control::' + serverObject.name + '-channel-list' );
+    serverObject = this.irc.connectServer( serverObject );
 
-    labelElement = document.createElement( 'label' );
-    labelElement.setAttribute( 'for', 'control::' + serverObject.name + '-channel-list' );
-    labelElement.innerHTML = serverObject.name;
+    if ( ! this.currentServer ) {
+      this.currentServer = serverObject;
+      this.currentNickname = serverObject.user.nickname;
+    }
 
-    channelListElement = document.createElement( 'ol' );
-    channelListElement.classList.add( 'channel-list' );
+    serverList.appendChild( this.renderTemplate( 'server-list-item', {
+      name: serverObject.name
+    }));
 
-    serverElement.appendChild( checkboxElement );
-    serverElement.appendChild( labelElement );
-    serverElement.appendChild( channelListElement );
+    if ( this.menus ) {
+      this.menus.servers.append( new gui.MenuItem( { label: serverObject.name } ) );
+    }
 
-    this.ui.serverList.appendChild( serverElement );
+    this.servers[serverObject.name] = serverObject;
+  }
+
+  if ( ! this.currentServer ) {
+    this.currentServer = serverObject;
   }
 }
 
@@ -129,22 +123,20 @@ App.prototype.addServer = function addServer ( serverObject ) {
 
 
 
-App.prototype.addSystemMessage = function addSystemMessage ( message, serverObject, channelName ) {
+App.prototype.addSystemMessage = function addSystemMessage ( message, serverName, channelName ) {
 
-  var channel, container, message, messageElement, nickname, reason;
+  var chat, hidden;
 
-  container = document.createElement( 'li' );
-  container.classList.add( 'chat-message', 'system-message', 'fade-in' );
-  container.setAttribute( 'data-server', serverObject.name );
-  container.setAttribute( 'data-channel', channelName );
+  chat = this.ui.chat;
+  hidden = serverName !== this.currentServer.name || channelName !== this.currentChannel;
 
-  container.innerHTML = message;
+  chat.appendChild( this.renderTemplate( 'chat-message', {
+    serverName: serverName,
+    channelName: channelName,
+    message: message,
+    hidden: hidden
+  }));
 
-  if ( serverObject.name !== this.currentServer.name || channelName !== this.currentChannel ) {
-    container.classList.add( 'hidden' );
-  }
-
-  this.ui.chat.appendChild( container );
   this.scrollToBottom();
 }
 
@@ -154,24 +146,20 @@ App.prototype.addSystemMessage = function addSystemMessage ( message, serverObje
 
 App.prototype.addUser = function addUser ( nickname, serverName, channelName ) {
 
-  var userElement;
+  var userList, hidden;
 
-  if ( this.ui.userList.querySelector( '[data-nickname="' + nickname + '"][data-server="' + serverName + '"][data-channel="' + channelName + '"]' ) ) {
-    return;
+  userList = this.ui.userList;
+
+  if ( ! userList.querySelector( '[data-nickname="' + nickname + '"][data-server="' + serverName + '"][data-channel="' + channelName + '"]' ) ) {
+    hidden = serverName !== this.currentServer.name || channelName !== this.currentChannel;
+
+    userList.appendChild( this.renderTemplate( 'user-list-item', {
+      serverName: serverName,
+      channelName: channelName,
+      nickname: nickname,
+      hidden: hidden
+    }));
   }
-
-  userElement = document.createElement( 'li' );
-  userElement.classList.add( 'user', 'fade-in' );
-  userElement.setAttribute( 'data-nickname', nickname );
-  userElement.setAttribute( 'data-server', serverName );
-  userElement.setAttribute( 'data-channel', channelName );
-  userElement.innerHTML = nickname;
-
-  if ( serverName !== this.currentServer.name || channelName !== this.currentChannel ) {
-    userElement.classList.add( 'hidden' );
-  }
-
-  this.ui.userList.appendChild( userElement );
 }
 
 
@@ -183,11 +171,6 @@ App.prototype.bindEvents = function bindEvents () {
   var self;
 
   self = this;
-
-  window.addEventListener( 'popstate', function ( event ) {
-    console.log( 'event', event );
-    console.log( 'window.location', window.location );
-  });
 
   window.addEventListener( 'click', function ( event ) {
 
@@ -234,11 +217,11 @@ App.prototype.bindEvents = function bindEvents () {
 
   this.irc.addListener( 'join', function ( serverObject, channelName, nickname ) {
     self.addUser( nickname, serverObject.name, channelName );
-    self.addSystemMessage( '<span data-nickname="' + nickname + '">' + nickname + '</span> joined ' + channelName, serverObject, channelName );
+    self.addSystemMessage( '<span data-nickname="' + nickname + '">' + nickname + '</span> joined ' + channelName, serverObject.name, channelName );
   });
 
   this.irc.addListener( 'message', function ( serverObject, nickname, channelName, message ) {
-    self.addMessage( nickname, message, serverObject, channelName );
+    self.addMessage( nickname, message, serverObject.name, channelName );
   });
 
   this.irc.addListener( 'names', function ( serverObject, channelName, nicknames ) {
@@ -258,11 +241,11 @@ App.prototype.bindEvents = function bindEvents () {
 
   this.irc.addListener( 'part', function ( serverObject, channelName, nickname, reason ) {
     self.removeUser( nickname, serverObject.name, channelName );
-    self.addSystemMessage( nickname + ' left ' + channelName, serverObject, channelName );
+    self.addSystemMessage( nickname + ' left ' + channelName, serverObject.name, channelName );
   });
 
   this.irc.addListener( 'selfMessage', function ( serverObject, channelName, message ) {
-    self.addMessage( self.currentNickname, message, serverObject, channelName );
+    self.addMessage( self.currentNickname, message, serverObject.name, channelName );
   });
 }
 
@@ -283,42 +266,107 @@ App.prototype.bindUI = function bindUI () {
 
 
 
-App.prototype.initialize = function initialize () {
+App.prototype.buildMenu = function buildMenu ( gui ) {
 
-  var serverKeys;
+  var currentWindow, menus;
 
-  this.bindUI();
-  this.bindEvents();
+  menus = {};
+  currentWindow = gui.Window.get();
+
+  menus.menubar = new gui.Menu({ type: "menubar" });
+
+  try {
+    menus.menubar.createMacBuiltin( 'APPPPPPPPPPP', {});
+
+  } catch ( err ) {
+    console.log( err.message );
+  }
+
+  currentWindow.menu = menus.menubar;
+
+  menus.file = new gui.Menu();
+  menus.menubar.insert( new gui.MenuItem( {
+    label: 'File',
+    submenu: menus.file
+  }), 1);
+
+  menus.servers = new gui.Menu();
+
+  menus.servers.append( new gui.MenuItem({ label: 'Connect to Server' }));
+  menus.servers.append( new gui.MenuItem({ type: 'separator' }));
 
   serverKeys = Object.keys( this.servers );
 
   for ( var i = 0; i < serverKeys.length; i++ ) {
-    var serverObject;
+    var serverName, submenu;
 
-    serverObject = this.servers[serverKeys[i]];
+    serverName = serverKeys[i];
 
-    this.addServer( serverObject );
+    submenu = new gui.Menu();
+    submenu.append( new gui.MenuItem({ label: 'Add Channel' }));
+    submenu.append( new gui.MenuItem({ type: 'separator' }));
+    submenu.append( new gui.MenuItem({ label: 'Disconnect' }));
+    submenu.append( new gui.MenuItem({ label: 'Delete' }));
 
-    if ( ! this.currentNickname ) {
-      this.currentNickname = serverObject.user.nickname;
-    }
+    menus.servers.append( new gui.MenuItem({
+      label: serverName,
+      submenu: submenu
+    }));
+  }
 
-    if ( ! this.currentServer ) {
-      this.currentServer = serverObject;
-    }
+  menus.menubar.insert( new gui.MenuItem( {
+    label: 'Servers',
+    submenu: menus.servers
+  }), 2);
 
-    for ( var i = 0; i < serverObject.channels.length; i++ ) {
-      var channelName = serverObject.channels[i];
+  this.menus = menus;
+}
 
-      this.addChannel( serverObject.name, channelName );
 
-      if ( ! this.currentChannel ) {
-        this.currentChannel = channelName;
-      }
+
+
+
+App.prototype.initialize = function initialize () {
+
+  this.loadTemplates()
+  this.bindUI();
+  this.bindEvents();
+
+  for ( var i = 0; i < this.config.servers.length; i++ ) {
+    var server;
+
+    server = this.config.servers[i];
+
+    this.addServer( server );
+
+    for ( var i = 0; i < server.channels.length; i++ ) {
+      var channel;
+
+      channel = server.channels[i];
+
+      this.addChannel( server.name, channel );
     }
   }
 
   this.switchChannel();
+}
+
+
+
+
+
+App.prototype.loadTemplates = function loadTemplates () {
+  var templates;
+
+  templates = fs.readdirSync( './templates' );
+
+  for ( var i = 0; i < templates.length; i++ ) {
+    var templateName;
+
+    templateName = templates[i].substring( 0, templates[i].length - 4 );
+
+    this.templates[templateName] = require( '../templates/' + templates[i] );
+  }
 }
 
 
@@ -334,6 +382,20 @@ App.prototype.removeUser = function removeUser ( nickname ) {
   if ( userElement ) {
     this.ui.userList.removeChild( userElement );
   }
+}
+
+
+
+
+
+App.prototype.renderTemplate = function renderTemplate ( templateName, data ) {
+  var element;
+
+  element = document.createElement( 'div' );
+  element.innerHTML = this.templates[templateName]( data );
+  element.children[0];
+
+  return element.children[0];
 }
 
 
