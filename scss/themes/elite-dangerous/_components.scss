@@ -1,8 +1,9 @@
-@import 'components/chat';
-@import 'components/chat-message';
+@import 'components/channel-list-item';
+@import 'components/chat-list';
+@import 'components/chat-list-item';
 @import 'components/chat-message-input';
-@import 'components/chat-rail';
 @import 'components/nickname';
 @import 'components/panel';
-@import 'components/server-list';
-@import 'components/user-list';
+@import 'components/rail';
+@import 'components/servers';
+@import 'components/users';

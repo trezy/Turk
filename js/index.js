@@ -1,18 +1,23 @@
-var App, app, gui, initializeMenu, IRC, irc;
+var App, app, config, initializeMenu, RootView;
 
 
 
 
 
-App = require( './js/App.js' );
-IRC = require( './js/IRC.js' );
-gui = require( 'nw.gui' );
+require( 'shims/smoothscroll' );
+
+config = require( '../config.json' );
+App = require( './App.js' );
+RootView = require( 'views/Root.js' );
 
 
 
 
 
-irc = new IRC();
-app = new App( irc, document );
+window.app = app = new App( config )//( document );
 
-app.buildMenu( gui );
+// Attach all of our views to the application object
+app.rootView = new RootView( window );
+
+// Start the application
+app.start();

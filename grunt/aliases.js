@@ -9,7 +9,9 @@ module.exports = {
     'buildJS'
   ],
 
-  buildJS: [],
+  buildJS: [
+    'webpack'
+  ],
 
   buildCSS: [
     'clean:css',

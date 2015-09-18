@@ -4,6 +4,17 @@ module.exports = {
     interrupt: true
   },
 
+  js: {
+    files: [
+      'js/**/*.js',
+      'templates/**/*.hbs',
+      'config.json'
+    ],
+    tasks: [
+      'buildJS'
+    ]
+  },
+
   sassApp: {
     files: [
       'scss/app/**/*.scss'

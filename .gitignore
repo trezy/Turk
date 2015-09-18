@@ -1,6 +1,8 @@
 ### Project ###
 builds/
 css/
+bundle.js
+bundle.js.map
 
 # Created by https://www.gitignore.io
 

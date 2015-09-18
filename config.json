@@ -4,12 +4,26 @@
       "address": "irc.ca.us.mibbit.net",
       "autoconnect": true,
       "channels": [
-        "#trezy2",
-        "#trezy"
+        {
+          "name": "#trezy"
+        },
+        {
+          "name": "#trezy2"
+        }
       ],
       "name": "Mibbit",
       "user": {
-        "nickname": "trezy-test"
+        "nickname": "Trezy[PC]"
+      }
+    },
+
+    {
+      "address": "chat.freenode.net",
+      "autoconnect": true,
+      "channels": [],
+      "name": "Freenode",
+      "user": {
+        "nickname": "Bobbah"
       }
     }
   ]
