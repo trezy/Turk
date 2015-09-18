@@ -41,14 +41,14 @@ App = Marionette.Application.extend({
       currentChannel = self.data.get( 'currentChannel' );
       servers = self.data.get( 'servers' );
 
-      chatView = new ChatView//( currentChannel.get( 'messages' ) );
-      chatInputView = new ChatInputView//( currentChannel.get( 'messages' ) );
-      chatListView = new ChatListView( { collection: currentChannel.get( 'messages' ) } );
+      chatView = new ChatView; //( currentChannel.get( 'messages' ) );
+      //chatInputView = new ChatInputView; //( currentChannel.get( 'messages' ) );
+      //chatListView = new ChatListView( { collection: currentChannel.get( 'messages' ) } );
       serverListView = new ServerListView( { collection: servers } );
       userListView = new UserListView( { collection: currentChannel.get( 'users' ) } );
 
-      self.chatInput.show( serverListView );
-      self.main.show( chatListView, { replaceElement: true } );
+      //self.chatInput.show( serverListView );
+      self.main.show( chatView, { replaceElement: true } );
       self.servers.show( serverListView );
       self.users.show( userListView );
     })

@@ -23,7 +23,7 @@ Chat = Marionette.LayoutView.extend({
   },
 
   initialize: function () {
-    //this.list.show( new ChatListView)//( { collection: messagesCollection } ) )
+    this.list.show( new ChatListView ); //( { collection: messagesCollection } ) )
   }
 });
 
