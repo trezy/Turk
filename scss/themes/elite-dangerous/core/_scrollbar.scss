@@ -1,0 +1,38 @@
+::-webkit-resizer {}
+
+::-webkit-scrollbar {
+  width: 3rem;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+::-webkit-scrollbar-corner {
+  display: none;
+}
+
+::-webkit-scrollbar-track {
+  background-image: linear-gradient(
+    to right,
+    rgba( $orange, 0 ) calc( 50% - 1px ),
+    rgba( $orange, 0.5 ) calc( 50% - 1px ),
+    rgba( $orange, 0.5 ) calc( 50% + 1px ),
+    rgba( $orange, 0 ) calc( 50% + 1px )
+  );
+  margin: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-image: linear-gradient(
+    to right,
+    rgba( $orange, 0 ) calc( 0% + 1rem ),
+    rgba( $orange, 1 ) calc( 0% + 1rem ),
+    rgba( $orange, 1 ) calc( 100% - 1rem ),
+    rgba( $orange, 0 ) calc( 100% - 1rem )
+  );
+}
+
+::-webkit-scrollbar-track-piece {
+  display: none;
+}
