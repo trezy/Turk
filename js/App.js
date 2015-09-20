@@ -1,4 +1,4 @@
-var _, AddChannelView, AddServerView, App, BackboneIntercept, ChatView, document, fs, gui, Marionette, ServersCollection, ServerListView, UserListView, util;
+var _, AddChannelView, AddServerView, App, BackboneIntercept, ChatView, document, fs, Marionette, Menu, MenuItem, ServersCollection, ServerListView, UserListView, util;
 
 
 
@@ -7,10 +7,12 @@ var _, AddChannelView, AddServerView, App, BackboneIntercept, ChatView, document
 _ = require( 'underscore' );
 fs = require( 'fs' );
 util = require( 'util' );
-gui = window.require( 'nw.gui' );
 Marionette = require( 'backbone.marionette' );
 BackboneIntercept = require( 'backbone.intercept' );
 require( 'shims/marionette.replaceElement' );
+
+Menu = Remote.require( 'menu' );
+MenuItem = Remote.require( 'menu-item' );
 
 ServersCollection = require( 'collections/Servers' );
 AddChannelView = require( 'views/AddChannel' );
@@ -50,19 +52,19 @@ App = Marionette.Application.extend({
     window.addEventListener( 'contextmenu', function ( event ) {
       var channel, channelName, menu, server, serverName;
 
-      menu = new gui.Menu();
+      menu = new Menu();
 
       if ( serverName = event.target.getAttribute( 'data-server' ) ) {
         server = self.data.get( 'servers' ).findWhere( { name: serverName } );
 
-        menu.append( new gui.MenuItem( {
+        menu.append( new MenuItem( {
           label: 'Disconnect',
           click: function () {
             server.disconnect();
           }
         }));
 
-        menu.append( new gui.MenuItem( {
+        menu.append( new MenuItem( {
           label: 'Add Channel',
           click: function () {
             self.dialog.show( new AddChannelView( { serverName: serverName } ) );
@@ -72,9 +74,9 @@ App = Marionette.Application.extend({
         if ( channelName = event.target.getAttribute( 'data-channel' ) ) {
           channel = server.get( 'channels' ).findWhere( { name: channelName } );
 
-          menu.append( new gui.MenuItem( { type: 'separator' } ) );
+          menu.append( new MenuItem( { type: 'separator' } ) );
 
-          menu.append( new gui.MenuItem( {
+          menu.append( new MenuItem( {
             label: 'Join Channel',
             click: function () {
               console.log( channel );
@@ -83,14 +85,14 @@ App = Marionette.Application.extend({
             }
           }));
 
-          menu.append( new gui.MenuItem( {
+          menu.append( new MenuItem( {
             label: 'Leave Channel',
             click: function () {
               // self.foobarbaz();
             }
           }));
 
-          menu.append( new gui.MenuItem( {
+          menu.append( new MenuItem( {
             label: 'Delete Channel',
             click: function () {
               // self.foobarbaz();
@@ -98,7 +100,7 @@ App = Marionette.Application.extend({
           }));
         }
 
-        menu.popup( event.x, event.y );
+        menu.popup( Remote.getCurrentWindow() );
       }
     });
 
@@ -173,7 +175,7 @@ App = Marionette.Application.extend({
 
   onStart: function () {
     this.bindEvents();
-    this.buildMenu();
+    //this.buildMenu();
 
     this.data.set( 'currentServer', this.data.get( 'servers' ).models[0] )
     this.data.set( 'currentChannel', this.data.get( 'currentServer' ).get( 'channels' ).models[0] )
