@@ -19,9 +19,12 @@ ChatList = Marionette.CollectionView.extend({
 
   childView: ChatListItemView,
 
-  onChildviewAttach: function ( childView ) {
-    childView.el.scrollIntoView( { behavior: 'smooth' } );
-    console.log( 'foo' )
+  onChildviewShow: function ( childView ) {
+    try {
+      childView.el.scrollIntoView( { behavior: 'smooth' } );
+    } catch ( error ) {
+      console.error( error );
+    }
   }
 });
 

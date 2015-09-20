@@ -1,1 +1,230 @@
-!function(e,t,r){"use strict";function n(){return e.performance!==r&&e.performance.now!==r?e.performance.now():Date.now()}function o(e){return.5*(1-Math.cos(Math.PI*e))}function a(e){if("object"!=typeof e||e.behavior===r||"auto"===e.behavior||"instant"===e.behavior)return!0;if("smooth"===e.behavior)return!1;throw new TypeError(e.behavior+" is not a valid value for enumeration ScrollBehavior")}function l(e,t,r){e.scrollTop=r,e.scrollLeft=t}function i(e){return e.clientHeight<e.scrollHeight||e.clientWidth<e.scrollWidth?e:e.parentNode.parentNode?i(e.parentNode):void 0}function s(t,r){function a(){var u,p,g,v=n(),d=(v-s)/f;return d=d>1?1:d,u=o(d),p=l+(t-l)*u,g=i+(r-i)*u,m(p,g),p===t&&g===r?(l=i=s=null,void e.cancelAnimationFrame(c)):void(c=e.requestAnimationFrame(a))}var l=e.scrollX||e.pageXOffset,i=e.scrollY||e.pageYOffset,s=n();c&&e.cancelAnimationFrame(c),c=e.requestAnimationFrame(a)}function u(t,r){function a(){var r,g,v,d=n(),h=(d-p)/f;return h=h>1?1:h,r=o(h),g=i+(u-i)*r,v=s+(m-s)*r,l(t,g,v),g===u&&v===m?(i=s=p=null,void e.cancelAnimationFrame(c)):void(c=e.requestAnimationFrame(a))}var i=t.scrollLeft,s=t.scrollTop,u=r.left,m=r.top,p=n();c&&e.cancelAnimationFrame(c),c=e.requestAnimationFrame(a)}if(!("scrollBehavior"in t.documentElement.style)){var c,f=768,m=e.scrollTo,p=e.scrollBy,g=e.Element.prototype.scrollIntoView;e.scroll=e.scrollTo=function(){return a(arguments[0])?m.call(e,arguments[0].left||arguments[0],arguments[0].top||arguments[1]):s.call(e,~~arguments[0].left,~~arguments[0].top)},e.scrollBy=function(){if(a(arguments[0]))return p.call(e,arguments[0].left||arguments[0],arguments[0].top||arguments[1]);var t=e.scrollX||e.pageXOffset,r=e.scrollY||e.pageYOffset;return s(~~arguments[0].left+t,~~arguments[0].top+r)},Element.prototype.scrollIntoView=function(){if(a(arguments[0]))return g.call(this,arguments[0]||!0);var t=i(this),r=e.getComputedStyle(t,null),n=parseInt(r.getPropertyValue("padding-left"),10),o=parseInt(r.getPropertyValue("padding-top"),10),l={top:this.offsetTop-2*o,left:this.offsetLeft-2*n};return u(t,l)}}}(window,document);
+(function(w, doc, undefined) {
+  'use strict';
+
+  /*
+   * alias
+   * w: window global object
+   * doc: document
+   * undefined: undefined
+   */
+
+  // return if scrollBehavior is supported
+  if ('scrollBehavior' in doc.documentElement.style) {
+    return;
+  }
+
+  var SCROLL_TIME = 768,
+      // legacy scrolling methods
+      originalScrollTo = w.scrollTo,
+      originalScrollBy = w.scrollBy,
+      originalScrollIntoView = w.Element.prototype.scrollIntoView,
+      // global frame variable to avoid collision
+      frame;
+
+  /*
+   * returns actual time
+   * @method now
+   * @returns {Date}
+   */
+  function now() {
+    // if performance object supported return now, if not fallback to date object
+    if (w.performance !== undefined && w.performance.now !== undefined) {
+      return w.performance.now();
+    }
+
+    return Date.now();
+  }
+
+  /*
+   * returns result of applying ease math function to a number
+   * @method ease
+   * @param {Number} k
+   * @returns {Number}
+   */
+  function ease(k) {
+    return 0.5 * (1 - Math.cos(Math.PI * k));
+  }
+
+  /*
+   * returns true if first argument is an options object and contains a smooth behavior
+   * @method shouldBailOut
+   * @param {Number|Object} x
+   * @returns {Boolean}
+   */
+  function shouldBailOut(x) {
+    if (typeof x !== 'object' || x.behavior === undefined || x.behavior === 'auto' || x.behavior === 'instant') {
+      // first arg not an object, or behavior is auto or undefined
+      return true;
+    } else if (x.behavior === 'smooth') {
+      // first argument is an object and behavior is smooth
+      return false;
+    }
+    // behavior not supported, throw error as Firefox implementation 37.0.2
+    throw new TypeError(x.behavior + ' is not a valid value for enumeration ScrollBehavior');
+  }
+
+  /*
+   * changes scroll position inside an element
+   * @method scrollElement
+   * @params {Node} el
+   * @params {Number} x
+   * @params {Number} y
+   */
+  function scrollElement(el, x, y) {
+    el.scrollTop = y;
+    el.scrollLeft = x;
+  }
+
+  /*
+   * finds scrollable parent of an element
+   * @method findScrollableParent
+   * @params {Node} el
+   */
+  function findScrollableParent(el) {
+    if (el.clientHeight < el.scrollHeight ||
+        el.clientWidth < el.scrollWidth) {
+      return el;
+    }
+
+    // only continue scaling if parentNode is valid
+    if (el.parentNode.parentNode) {
+      return findScrollableParent(el.parentNode);
+    }
+  }
+
+  /*
+   * scrolls window with a smooth behavior
+   * @method smoothScroll
+   * @params {Number} x
+   * @params {Number} y
+   */
+  function smoothScroll(x, y) {
+    var sx = w.scrollX || w.pageXOffset,
+        sy = w.scrollY || w.pageYOffset,
+        startTime = now();
+
+    // cancel frame is there is an scroll event happening
+    if (frame) {
+      w.cancelAnimationFrame(frame);
+    }
+
+    frame = w.requestAnimationFrame(step);
+
+    // scroll looping over a frame
+    function step() {
+      var time = now(), value, cx, cy,
+          elapsed = (time - startTime) / SCROLL_TIME;
+
+      // avoid elapsed times higher than one
+      elapsed = elapsed > 1 ? 1 : elapsed;
+
+      value = ease(elapsed);
+      cx = sx + (x - sx) * value;
+      cy = sy + (y - sy) * value;
+
+      originalScrollTo(cx, cy);
+
+      // return if end points have been reached
+      if (cx === x && cy === y) {
+        sx = sy = startTime = null;
+        w.cancelAnimationFrame(frame);
+        return;
+      }
+
+      frame = w.requestAnimationFrame(step);
+    }
+  }
+
+  /*
+   * scrolls inside an element with a smooth behavior
+   * @method smoothScrollElement
+   * @params {Node} el
+   * @params {Object} endCoords
+   */
+  function scrollSmoothElement(el, endCoords) {
+    var sx = el.scrollLeft,
+        sy = el.scrollTop,
+        x = endCoords.left,
+        y = endCoords.top,
+        startTime = now();
+
+    // cancel frame is there is an scroll event happening
+    if (frame) {
+      w.cancelAnimationFrame(frame);
+    }
+
+    frame = w.requestAnimationFrame(step);
+
+    // scroll looping over a frame
+    function step() {
+      var time = now(), value, cx, cy,
+          elapsed = (time - startTime) / SCROLL_TIME;
+
+      // avoid elapsed times higher than one
+      elapsed = elapsed > 1 ? 1 : elapsed;
+
+      value = ease(elapsed);
+      cx = sx + (x - sx) * value;
+      cy = sy + (y - sy) * value;
+
+      scrollElement(el, cx, cy);
+
+      // return if end points have been reached
+      if (cx === x && cy === y) {
+        sx = sy = startTime = null;
+        w.cancelAnimationFrame(frame);
+        return;
+      }
+
+      frame = w.requestAnimationFrame(step);
+    }
+  }
+
+  // ORIGINAL METHODS OVERRIDES
+  // window.scroll and window.scrollTo
+  w.scroll = w.scrollTo = function() {
+    if (shouldBailOut(arguments[0])) {
+      // if first argument is an object with auto behavior send left and top coordenates
+      return originalScrollTo.call(w, arguments[0].left || arguments[0], arguments[0].top || arguments[1]);
+    }
+
+    return smoothScroll.call(w, ~~arguments[0].left, ~~arguments[0].top);
+  };
+
+  // window.scrollBy
+  w.scrollBy = function() {
+    if (shouldBailOut(arguments[0])) {
+      // if first argument is an object with auto behavior send left and top coordenates
+      return originalScrollBy.call(w, arguments[0].left || arguments[0], arguments[0].top || arguments[1]);
+    }
+
+    var sx = w.scrollX || w.pageXOffset,
+        sy = w.scrollY || w.pageYOffset;
+
+    return smoothScroll(~~arguments[0].left + sx, ~~arguments[0].top + sy);
+  };
+
+  // Element.scrollIntoView
+  Element.prototype.scrollIntoView = function() {
+    var elementRects, paddingLeft, paddingTop, scrollableParent, style;
+
+    if (shouldBailOut(arguments[0])) {
+      return originalScrollIntoView.call(this, arguments[0] || true);
+    }
+
+    if (scrollableParent = findScrollableParent(this)) {
+      style = w.getComputedStyle(scrollableParent, null),
+      paddingLeft = parseInt(style.getPropertyValue('padding-left'), 10),
+      paddingTop = parseInt(style.getPropertyValue('padding-top'), 10),
+      elementRects = {
+        top: this.offsetTop - paddingTop * 2,
+        left: this.offsetLeft - paddingLeft * 2
+      };
+
+      return scrollSmoothElement(scrollableParent, elementRects);
+    } else {
+      return;
+    }
+  };
+
+}(window, document));
