@@ -17,9 +17,10 @@ ChannelsCollection = require( 'collections/Channels' );
 Server = Backbone.Model.extend({
   defaults: {
     address: null,
-    channels: new ChannelsCollection,
+    channels: null,
     client: null,
     motd: null,
+    name: null,
     registered: false,
     user: null
   },
@@ -181,11 +182,25 @@ Server = Backbone.Model.extend({
     channelData = this.get( 'channels' );
     userData = this.get( 'user' );
 
+    this.set( 'channels', new ChannelsCollection );
+    this.get( 'channels' ).server = this;
+    this.get( 'channels' ).add( channelData, { parse: true } );
+
     this.set( 'user', new UserModel( userData ) );
-    this.set( 'channels', new ChannelsCollection( channelData, { parse: true } ) );
     this.set( 'client', new IRC.Client( this.get( 'address' ), this.get( 'user' ).get( 'nickname' ) ) );
 
     this.bindServerEvents();
+  },
+
+  joinChannel: function ( channel ) {
+    if ( typeof channel === 'string' ) {
+      channel = this.get( 'channels' ).add({
+        name: channel,
+        server: this
+      });
+    }
+
+    channel.join();
   },
 
   joinChannels: function () {
@@ -193,9 +208,17 @@ Server = Backbone.Model.extend({
 
     self = this;
 
-    this.get( 'channels' ).forEach( function ( channel, index, collection ) {
-      self.get( 'client' ).join( channel.get( 'name' ) );
-    });
+    this.get( 'channels' ).each( this.joinChannel, this )
+  },
+
+  leaveChannel: function ( channel ) {
+    if ( typeof channel === 'string' ) {
+      channel = this.get( 'channels' ).add({
+        name: channel
+      });
+    }
+
+    this.get( 'client' ).part( channel.get( 'name' ) );
   }
 });
 

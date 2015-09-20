@@ -1,0 +1,11 @@
+.chat-input {
+  animation-delay: 0.6s;
+  border-image: none;
+  border-width: 0;
+  border-top-width: 1px;
+  color: $white;
+  flex-shrink: 0;
+  font-family: 'Sintony';
+  font-size: 0.8em;
+  padding: $default-gutter;
+}

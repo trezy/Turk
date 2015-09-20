@@ -14,7 +14,7 @@ RootView = require( 'views/Root.js' );
 
 
 
-window.app = app = new App( config )//( document );
+window.app = app = new App( config );
 
 // Attach all of our views to the application object
 app.rootView = new RootView( window );

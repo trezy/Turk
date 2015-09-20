@@ -1,0 +1,12 @@
+dialog {
+  .dialog-content,
+  .dialog-footer {
+    padding: 2rem;
+  }
+
+  .dialog-footer {
+    border-color: rgba( $orange, 0.5 );
+    border-style: solid;
+    border-top-width: 1px;
+  }
+}

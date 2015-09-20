@@ -18,24 +18,13 @@ Root = Marionette.LayoutView.extend({
 
   regions: {
     chatInput: '.chat-input',
-    dialog: 'dialog',
+    dialog: '.dialog',
     main: 'main',
     servers: '.servers',
     users: '.users'
   },
 
-  onAttach: function () {
-
-  },
-
-  initialize: function ( window ) {
-    var app;
-
-    app = window.app;
-
-    // Render the base elements that will become the Application's regions
-    this.render();
-
+  onRender: function () {
     // Attach our regions to the main application object for use across the
     // application.
     app.chatInput = this.chatInput;
@@ -43,8 +32,11 @@ Root = Marionette.LayoutView.extend({
     app.main = this.main;
     app.servers = this.servers;
     app.users = this.users;
+  },
 
-    console.log( this.getRegions() )
+  initialize: function ( window ) {
+    // Render the base elements that will become the Application's regions
+    this.render();
   }
 });
 

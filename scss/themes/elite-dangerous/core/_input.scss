@@ -1,0 +1,19 @@
+input {
+  border-color: rgba( $orange, 0.5 );
+  border-style: solid;
+  border-image-repeat: stretch;
+  border-image-source: linear-gradient(
+    to right,
+    rgba( $orange, 0.5 ),
+    rgba( $orange, 0.5 ) 5%,
+    rgba( $orange, 0 ) 5%,
+    rgba( $orange, 0 ) 95%,
+    rgba( $orange, 0.5 ) 95%,
+    rgba( $orange, 0.5 )
+  );
+  border-image-slice: 1;
+  border-width: 1px;
+  color: $white;
+  font-family: 'Sintony';
+  font-size: 0.8em;
+}

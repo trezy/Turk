@@ -7,7 +7,9 @@ Marionette = require( 'backbone.marionette' );
 Marionette.Region.prototype.show = function (view, options) {
   var showOptions, isDifferentView, preventDestroy, forceShow, replaceElement, isChangingView, _shouldDestroyView, _shouldShowView, _shouldReplaceElement;
 
-  this._ensureElement()
+  if ( !this._ensureElement() ) {
+    return;
+  }
 
   showOptions = options || {};
   isDifferentView = view !== this.currentView;

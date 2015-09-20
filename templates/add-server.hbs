@@ -1,3 +1,38 @@
 <form>
-  <input type="text">
+  <header class="dialog-header">
+    <h1>Add Server</h1>
+  </header>
+
+  <div class="dialog-content">
+    <table>
+      <tbody>
+        <tr>
+          <th>Name</th>
+          <td>
+            <input type="text" name="name" autofocus>
+          </td>
+        </tr>
+        <tr>
+          <th>Address</th>
+          <td>
+            <input type="text" name="address">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="dialog-footer control-bar">
+    <div class="primary-controls">
+      <button type="submit">
+        Add
+      </button>
+    </div>
+
+    <div class="secondary-controls">
+      <button data-modal-dismiss type="button">
+        Cancel
+      </button>
+    </div>
+  </footer>
 </form>

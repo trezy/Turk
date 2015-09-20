@@ -1,0 +1,23 @@
+dialog {
+  background: none;
+  border: none;
+  color: currentColor;
+  margin: auto !important;
+  padding: 0;
+  position: absolute !important;
+
+  &::backdrop {
+    background-color: rgba( black, 0.5 );
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+  }
+
+  .dialog-header {}
+
+  .dialog-content {}
+
+  .dialog-footer {}
+}

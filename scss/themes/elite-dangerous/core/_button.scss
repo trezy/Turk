@@ -1,18 +1,25 @@
 button, .button {
   background-color: rgba( $orange, 0.2 );
+  background-image: repeating-linear-gradient(
+    33deg,
+    transparent,
+    transparent 3px,
+    rgba( $white, 0.02 ) 3px,
+    rgba( $white, 0.02 ) 4px
+  );
   border: none;
   color: inherit;
-  display: block;
+  cursor: pointer;
+  display: inline-block;
   font-family: inherit;
   font-size: inherit;
-  margin: 1rem;
   overflow: hidden;
   padding: 1rem;
   text-align: left;
   text-decoration: none;
   text-overflow: ellipsis;
+  vertical-align: middle;
   white-space: nowrap;
-  width: calc( 100% - 2rem );
 
   &:hover {
     background-color: rgba( $orange, 1 );

@@ -8,6 +8,8 @@
   "license": "MIT",
   "dependencies": {
     "backbone": "^1.2.3",
+    "backbone.base-router": "^1.1.0",
+    "backbone.intercept": "^0.4.0",
     "backbone.marionette": "^2.4.3",
     "handlebars": "^4.0.2",
     "irc": "^0.3.12",

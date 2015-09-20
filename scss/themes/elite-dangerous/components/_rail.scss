@@ -1,3 +1,8 @@
 .rail {
   width: 30rem;
+
+  button, .button {
+    margin: 1rem;
+    width: calc( 100% - 2rem );
+  }
 }

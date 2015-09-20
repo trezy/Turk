@@ -28,6 +28,7 @@ module.exports = {
       alias: {
         collections: __dirname + '/../js/collections',
         models: __dirname + '/../js/models',
+        routes: __dirname + '/../js/routes',
         shims: __dirname + '/../js/shims',
         templates: __dirname + '/../templates',
         views: __dirname + '/../js/views'

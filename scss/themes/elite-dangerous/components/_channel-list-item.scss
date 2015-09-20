@@ -1,4 +1,8 @@
 .channel-list-item {
   align-items: center;
   display: flex;
+
+  p {
+    word-break: break-all;
+  }
 }

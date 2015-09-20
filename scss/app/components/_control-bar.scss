@@ -1,0 +1,16 @@
+.control-bar {
+  display: flex;
+  justify-content: space-between;
+
+  .primary-controls,
+  .secondary-controls {
+  }
+
+  .primary-controls {
+    order: 2;
+  }
+
+  .secondary-controls {
+    order: 1;
+  }
+}

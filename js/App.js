@@ -1,4 +1,4 @@
-var _, App, ChatListView, document, fs, gui, Marionette, ServersCollection, ServerListView, util;
+var _, AddChannelView, AddServerView, App, BackboneIntercept, ChatView, document, fs, gui, Marionette, ServersCollection, ServerListView, UserListView, util;
 
 
 
@@ -9,12 +9,12 @@ fs = require( 'fs' );
 util = require( 'util' );
 gui = window.require( 'nw.gui' );
 Marionette = require( 'backbone.marionette' );
+BackboneIntercept = require( 'backbone.intercept' );
 require( 'shims/marionette.replaceElement' );
 
 ServersCollection = require( 'collections/Servers' );
-
-ChatInputView = require( 'views/ChatInput' );
-ChatListView = require( 'views/ChatList' );
+AddChannelView = require( 'views/AddChannel' );
+AddServerView = require( 'views/AddServer' );
 ChatView = require( 'views/Chat' );
 ServerListView = require( 'views/ServerList' );
 UserListView = require( 'views/UserList' );
@@ -36,25 +36,132 @@ App = Marionette.Application.extend({
     self = this;
 
     this.listenTo( this.data, 'change:currentChannel', function ( model ) {
-      var chatListView, chatView, currentChannel, serverListView, servers, userListView;
+      var chatListView, chatView, serverListView, userListView;
 
-      currentChannel = self.data.get( 'currentChannel' );
-      servers = self.data.get( 'servers' );
+      chatView = new ChatView;
+      serverListView = new ServerListView( { collection: self.data.get( 'servers' ) } );
+      userListView = new UserListView( { collection: self.data.get( 'currentChannel' ).get( 'users' ) } );
 
-      chatView = new ChatView; //( currentChannel.get( 'messages' ) );
-      //chatInputView = new ChatInputView; //( currentChannel.get( 'messages' ) );
-      //chatListView = new ChatListView( { collection: currentChannel.get( 'messages' ) } );
-      serverListView = new ServerListView( { collection: servers } );
-      userListView = new UserListView( { collection: currentChannel.get( 'users' ) } );
-
-      //self.chatInput.show( serverListView );
       self.main.show( chatView, { replaceElement: true } );
       self.servers.show( serverListView );
       self.users.show( userListView );
-    })
+    });
+
+    window.addEventListener( 'contextmenu', function ( event ) {
+      var channel, channelName, menu, server, serverName;
+
+      menu = new gui.Menu();
+
+      if ( serverName = event.target.getAttribute( 'data-server' ) ) {
+        server = self.data.get( 'servers' ).findWhere( { name: serverName } );
+
+        menu.append( new gui.MenuItem( {
+          label: 'Disconnect',
+          click: function () {
+            server.disconnect();
+          }
+        }));
+
+        menu.append( new gui.MenuItem( {
+          label: 'Add Channel',
+          click: function () {
+            self.dialog.show( new AddChannelView( { serverName: serverName } ) );
+          }
+        }));
+
+        if ( channelName = event.target.getAttribute( 'data-channel' ) ) {
+          channel = server.get( 'channels' ).findWhere( { name: channelName } );
+
+          menu.append( new gui.MenuItem( { type: 'separator' } ) );
+
+          menu.append( new gui.MenuItem( {
+            label: 'Join Channel',
+            click: function () {
+              console.log( channel );
+              channel.join();
+              console.log( channel );
+            }
+          }));
+
+          menu.append( new gui.MenuItem( {
+            label: 'Leave Channel',
+            click: function () {
+              // self.foobarbaz();
+            }
+          }));
+
+          menu.append( new gui.MenuItem( {
+            label: 'Delete Channel',
+            click: function () {
+              // self.foobarbaz();
+            }
+          }));
+        }
+
+        menu.popup( event.x, event.y );
+      }
+    });
+
+    window.addEventListener( 'hashchange', function () {
+      var channel, hash, server;
+
+      hash = location.hash.substring( 2 ).split( '/' );
+      self.data.set( 'currentServer', self.data.get( 'servers' ).findWhere( { name: hash[0] } ) );
+
+      server = self.data.get( 'currentServer' );
+
+      if ( hash.length === 2 ) {
+        self.data.set( 'currentChannel', server.get( 'channels' ).findWhere( { name: '#' + hash[1] } ) );
+      }
+    });
   },
 
-  initialize: function ( config, irc ) {
+  buildMenu: function () {
+    var currentWindow, menus, self;
+
+    self = this;
+    menus = {};
+    currentWindow = gui.Window.get();
+
+    menus.menubar = new gui.Menu({ type: 'menubar' });
+
+    try {
+      menus.menubar.createMacBuiltin( 'APPPPPPPPPPP', {});
+    } catch ( err ) {
+      console.log( err.message );
+    }
+
+    currentWindow.menu = menus.menubar;
+
+    menus.file = new gui.Menu();
+    menus.menubar.insert( new gui.MenuItem( {
+      label: 'File',
+      submenu: menus.file
+    }), 1);
+
+    menus.file.append( new gui.MenuItem( { label: 'Preferences' } ) );
+
+    //serverKeys = Object.keys( this.servers );
+
+    //for ( var i = 0; i < serverKeys.length; i++ ) {
+    //  var serverName, submenu;
+
+    //  serverName = serverKeys[i];
+
+    //  submenu = new gui.Menu();
+    //  submenu.append( new gui.MenuItem( { label: 'Add Channel' }, function () {} ) );
+    //  submenu.append( new gui.MenuItem( { type: 'separator' }, function () {} ) );
+    //  submenu.append( new gui.MenuItem( { label: 'Disconnect' }, function () {} ) );
+    //  submenu.append( new gui.MenuItem( { label: 'Delete' }, function () {} ) );
+
+    //  menus.servers.append( new gui.MenuItem({
+    //    label: serverName,
+    //    submenu: submenu
+    //  }));
+    //}
+  },
+
+  initialize: function ( config ) {
     for ( var i = 0; i < config.servers.length; i++ ) {
       var server;
 
@@ -66,8 +173,17 @@ App = Marionette.Application.extend({
 
   onStart: function () {
     this.bindEvents();
+    this.buildMenu();
+
     this.data.set( 'currentServer', this.data.get( 'servers' ).models[0] )
     this.data.set( 'currentChannel', this.data.get( 'currentServer' ).get( 'channels' ).models[0] )
+
+    Backbone.history.start( { pushState: true } );
+    BackboneIntercept.start();
+  },
+
+  sendMessage: function ( message ) {
+    this.data.get( 'currentChannel' ).sendMessage( message );
   }
 });
 
