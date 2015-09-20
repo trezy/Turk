@@ -1,4 +1,8 @@
 .chat {
   display: flex;
   flex-direction: column;
+
+  header {
+    flex-shrink: 0;
+  }
 }
