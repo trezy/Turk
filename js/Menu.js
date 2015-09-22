@@ -45,24 +45,34 @@ window.addEventListener( 'contextmenu', function ( event ) {
         click: function () {
           console.log( channel );
           channel.join();
-          console.log( channel );
         }
       }));
 
       menu.append( new MenuItem( {
         label: 'Leave Channel',
         click: function () {
-          // self.foobarbaz();
+          console.log( channel );
+          channel.leave();
         }
       }));
 
       menu.append( new MenuItem( {
         label: 'Delete Channel',
         click: function () {
-          // self.foobarbaz();
+          channel.leave();
+          channel.collection.remove( channel )
         }
       }));
     }
+
+    menu.append( new MenuItem( { type: 'separator' } ) );
+
+    menu.append( new MenuItem( {
+      label: 'Server Properties',
+      click: function () {
+        self.dialog.show( new AddChannelView( { serverName: serverName } ) );
+      }
+    }));
 
     menu.popup( event.x, event.y );
   }

@@ -32,6 +32,11 @@ Channel = Backbone.Model.extend({
     this.set( 'serverName', this.get( 'server' ).get( 'name' ) );
   },
 
+  leave: function () {
+    this.get( 'server' ).get( 'client' ).part( this.get( 'name' ) );
+    this.set( 'joined', false );
+  },
+
   join: function () {
     this.get( 'server' ).get( 'client' ).join( this.get( 'name' ) );
     this.set( 'joined', true );

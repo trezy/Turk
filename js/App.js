@@ -79,26 +79,34 @@ App = Marionette.Application.extend({
           menu.append( new MenuItem( {
             label: 'Join Channel',
             click: function () {
-              console.log( channel );
               channel.join();
-              console.log( channel );
             }
           }));
 
           menu.append( new MenuItem( {
             label: 'Leave Channel',
             click: function () {
-              // self.foobarbaz();
+              channel.leave();
             }
           }));
 
           menu.append( new MenuItem( {
             label: 'Delete Channel',
             click: function () {
-              // self.foobarbaz();
+              channel.leave();
+              channel.collection.remove( channel )
             }
           }));
         }
+
+        menu.append( new MenuItem( { type: 'separator' } ) );
+
+        menu.append( new MenuItem( {
+          label: 'Server Properties',
+          click: function () {
+            self.dialog.show( new ServerPropertiesView( { serverName: serverName } ) );
+          }
+        }));
 
         menu.popup( Remote.getCurrentWindow() );
       }

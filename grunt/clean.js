@@ -1,5 +1,7 @@
 module.exports = {
-  css: [
-    'css'
-  ]
+  builds: 'builds',
+
+  css: 'css',
+
+  dist: 'app'
 }
