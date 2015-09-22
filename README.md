@@ -12,5 +12,5 @@ The `grunt dist` task will:
 * Make sure all of our files are compiled and minified;
 * Create binaries from the compiled files and gather the necessary drivers to be packaged;
 * Build installers or the binaries.
- 
+
 Woot, you're done! :-)
