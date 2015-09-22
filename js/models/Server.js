@@ -45,6 +45,13 @@ Server = Backbone.Model.extend({
       }
     });
 
+    client.addListener( 'error', function ( message ) {
+      console.group( self.get( 'name' ) + ' encountered an error' )
+      console.error( 'Server Model:', self )
+      console.error( 'Error:', message )
+      console.groupEnd()
+    });
+
     client.addListener( 'kick', function ( channelName, nickname, reason ) {
       var channel, user, users;
 
@@ -176,6 +183,14 @@ Server = Backbone.Model.extend({
     });
   },
 
+  changeNickname: function ( newNickname ) {
+    this.get( 'client' ).send( 'NICK', newNickname );
+  },
+
+  disconnect: function () {
+    this.get( 'client' ).disconnect();
+  },
+
   initialize: function () {
     var channelData, userData;
 
@@ -218,7 +233,7 @@ Server = Backbone.Model.extend({
       });
     }
 
-    this.get( 'client' ).part( channel.get( 'name' ) );
+    channel.leave();
   }
 });
 

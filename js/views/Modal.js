@@ -22,10 +22,6 @@ Modal = Marionette.LayoutView.extend({
 
   onShow: function () {
     this.el.showModal();
-  },
-
-  onBeforeDestroy: function () {
-    this.el.close();
   }
 });
 
