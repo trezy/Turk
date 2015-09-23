@@ -1,17 +1,16 @@
-# trezy-irc
-This is an IRC client built with node-irc running in nwjs. I'm calling it trezy-irc because I can't come up with a better name at the moment.
+# Turk
+Turk is an IRC client built with node-irc and Electron.
 
-# Running
-Make sure you have `nwjs` installed globally:
+# Development
 
-```
-npm install -g nwjs
-```
+Run `grunt` to compile everything and watch for changes, then `npm start` to load up the app.
 
-Then run `grunt` to build your Sass files:
+# Packaging
 
-```
-grunt
-```
+The `grunt dist` task will:
 
-Finally, run `nwjs` to launch the app.
+* Make sure all of our files are compiled and minified;
+* Create binaries from the compiled files and gather the necessary drivers to be packaged;
+* Build installers or the binaries.
+ 
+Woot, you're done! :-)
