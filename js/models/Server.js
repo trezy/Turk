@@ -1,4 +1,4 @@
-var _, Backbone, IRC, Server, ChannelsCollection;
+var _, Backbone, IRC, Server, ChannelsCollection, UsersCollection, UserModel;
 
 
 
@@ -9,6 +9,7 @@ Backbone = require( 'backbone' );
 IRC = require( 'irc' );
 UserModel = require( 'models/User' );
 ChannelsCollection = require( 'collections/Channels' );
+UsersCollection = require( 'collections/Users' );
 
 
 
@@ -22,7 +23,8 @@ Server = Backbone.Model.extend({
     motd: null,
     name: null,
     registered: false,
-    user: null
+    user: null,
+    users: null
   },
 
   bindServerEvents: function () {
@@ -94,6 +96,7 @@ Server = Backbone.Model.extend({
           user.set( 'nickname', newNickname )
         }
       }
+      console.log( 'Name changed from', oldNickname, 'to', newNickname )
     });
 
     client.addListener( 'message', function ( nickname, channelName, message ) {
@@ -117,17 +120,23 @@ Server = Backbone.Model.extend({
       nicknameKeys = Object.keys( nicknames );
 
       for ( var i = 0; i < nicknameKeys.length; i++ ) {
-        var nickname;
+        var nickname, opStatus, user;
 
         nickname = nicknameKeys[i];
+        opStatus = nicknames[nickname];
+        user = self.get( 'users' ).findWhere( { nickname: nickname } );
 
-        nicknamesArray.push({
-          nickname: nickname,
-          operator: nicknames[nickname] === '@'
-        });
+        if ( !user ) {
+          user = self.get( 'users' ).add({
+            nickname: nickname,
+            operator: opStatus
+          });
+        }
+
+        channel.get( 'users' ).add( user );
       }
 
-      channel.get( 'users' ).reset( nicknamesArray );
+      console.log( channelName + ' Users', channel.get( 'users' ) )
     });
 
     client.addListener( 'part', function ( channelName, nickname, reason ) {
@@ -196,6 +205,8 @@ Server = Backbone.Model.extend({
 
     channelData = this.get( 'channels' );
     userData = this.get( 'user' );
+
+    this.set( 'users', new UsersCollection );
 
     this.set( 'channels', new ChannelsCollection );
     this.get( 'channels' ).server = this;
