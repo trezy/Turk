@@ -1,11 +1,11 @@
-var _, Backbone, IRC, Server, ChannelsCollection, UsersCollection, UserModel;
+var _, BaseModel, IRC, Server, ChannelsCollection, UsersCollection, UserModel;
 
 
 
 
 
 _ = require( 'underscore' );
-Backbone = require( 'backbone' );
+BaseModel = require( 'models/Base' );
 IRC = require( 'irc' );
 UserModel = require( 'models/User' );
 ChannelsCollection = require( 'collections/Channels' );
@@ -15,7 +15,7 @@ UsersCollection = require( 'collections/Users' );
 
 
 
-Server = Backbone.Model.extend({
+Server = BaseModel.extend({
   defaults: {
     address: null,
     channels: null,
@@ -83,22 +83,6 @@ Server = Backbone.Model.extend({
       self.set( 'motd', motd );
     });
 
-    client.addListener( 'nick', function ( oldNickname, newNickname, channelNames ) {
-      for ( var i = 0; i < channelNames.length; i++ ) {
-        var channel, user, users;
-
-        channel = self.get( 'channels' ).findWhere( { name: channelNames[i] } );
-
-        if ( channel ) {
-          users = channel.get( 'users' );
-          user = users.findWhere( { nickname: oldNickname } );
-
-          user.set( 'nickname', newNickname )
-        }
-      }
-      console.log( 'Name changed from', oldNickname, 'to', newNickname )
-    });
-
     client.addListener( 'message', function ( nickname, channelName, message ) {
       var channel, user;
 
@@ -133,10 +117,18 @@ Server = Backbone.Model.extend({
           });
         }
 
-        channel.get( 'users' ).add( user );
+        'Channel User:', channel.get( 'users' ).add( user );
       }
+    });
 
-      console.log( channelName + ' Users', channel.get( 'users' ) )
+    client.addListener( 'nick', function ( oldNickname, newNickname ) {
+      var user;
+
+      user = self.get( 'users' ).findWhere( { nickname: oldNickname } );
+      console.log( user );
+
+      user.set( 'nickname', newNickname );
+      console.log( user );
     });
 
     client.addListener( 'part', function ( channelName, nickname, reason ) {
@@ -219,11 +211,22 @@ Server = Backbone.Model.extend({
   },
 
   joinChannel: function ( channel ) {
+    var channelName, channels;
+
     if ( typeof channel === 'string' ) {
-      channel = this.get( 'channels' ).add({
-        name: channel,
-        server: this
-      });
+      channelName = channel;
+      channels = this.get( 'channels' )
+
+      if ( channelName.substring( 0, 1 ) != '#' ) {
+        channelName = '#' + channelName;
+      }
+
+      if ( !( channel = channels.findWhere( { name: channelName } ) ) ) {
+        channel = channels.add({
+          name: channelName,
+          server: this
+        });
+      }
     }
 
     channel.join();
@@ -238,10 +241,17 @@ Server = Backbone.Model.extend({
   },
 
   leaveChannel: function ( channel ) {
+    var channelName, channels;
+
     if ( typeof channel === 'string' ) {
-      channel = this.get( 'channels' ).add({
-        name: channel
-      });
+      channelName = channel;
+      channels = this.get( 'channels' );
+
+      if ( channelName.substring( 0, 1 ) != '#' ) {
+        channelName = '#' + channelName;
+      }
+
+      channel = channels.findWhere( { name: channelName } );
     }
 
     channel.leave();
