@@ -1,4 +1,4 @@
-var _, AddChannelView, AddServerView, App, BackboneIntercept, ChatView, document, fs, Marionette, Menu, MenuItem, ServersCollection, ServerListView, UserListView, util;
+var _, AddChannelView, AddServerView, App, Backbone, BackboneIntercept, ChatView, document, fs, Marionette, Menu, MenuItem, ServersCollection, ServerListView, UserListView, util;
 
 
 
@@ -7,6 +7,7 @@ var _, AddChannelView, AddServerView, App, BackboneIntercept, ChatView, document
 _ = require( 'underscore' );
 fs = require( 'fs' );
 util = require( 'util' );
+Backbone = require( 'backbone' );
 Marionette = require( 'backbone.marionette' );
 BackboneIntercept = require( 'backbone.intercept' );
 require( 'shims/marionette.replaceElement' );
@@ -17,6 +18,7 @@ MenuItem = Remote.require( 'menu-item' );
 ServersCollection = require( 'collections/Servers' );
 AddChannelView = require( 'views/AddChannel' );
 AddServerView = require( 'views/AddServer' );
+ChangeNicknameView = require( 'views/ChangeNickname' );
 ChatView = require( 'views/Chat' );
 ServerListView = require( 'views/ServerList' );
 UserListView = require( 'views/UserList' );
@@ -65,6 +67,13 @@ App = Marionette.Application.extend({
         }));
 
         menu.append( new MenuItem( {
+          label: 'Change Nickname',
+          click: function () {
+            self.dialog.show( new ChangeNicknameView( { serverName: serverName } ) );
+          }
+        }));
+
+        menu.append( new MenuItem( {
           label: 'Add Channel',
           click: function () {
             self.dialog.show( new AddChannelView( { serverName: serverName } ) );
@@ -99,14 +108,14 @@ App = Marionette.Application.extend({
           }));
         }
 
-        menu.append( new MenuItem( { type: 'separator' } ) );
+        // menu.append( new MenuItem( { type: 'separator' } ) );
 
-        menu.append( new MenuItem( {
-          label: 'Server Properties',
-          click: function () {
-            self.dialog.show( new ServerPropertiesView( { serverName: serverName } ) );
-          }
-        }));
+        // menu.append( new MenuItem( {
+        //   label: 'Server Properties',
+        //   click: function () {
+        //     self.dialog.show( new ServerPropertiesView( { serverName: serverName } ) );
+        //   }
+        // }));
 
         menu.popup( Remote.getCurrentWindow() );
       }
