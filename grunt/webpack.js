@@ -26,6 +26,8 @@ module.exports = {
 
     resolve: {
       alias: {
+        backbone: __dirname + '/../node_modules/backbone',
+
         collections: __dirname + '/../js/collections',
         models: __dirname + '/../js/models',
         routes: __dirname + '/../js/routes',
