@@ -1,16 +1,16 @@
-var Backbone, Message;
+var BaseModel, Message;
 
 
 
 
 
-Backbone = require( 'backbone' );
+BaseModel = require( 'models/Base' );
 
 
 
 
 
-Message = Backbone.Model.extend({
+Message = BaseModel.extend({
   defaults: {
     user: null,
     message: null

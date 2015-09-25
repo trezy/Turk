@@ -1,18 +1,20 @@
-var Backbone, Users, User;
+var BaseCollection, Users, User;
 
 
 
 
 
-Backbone = require( 'backbone' );
+BaseCollection = require( 'collections/Base' );
 User = require( 'models/User' );
 
 
 
 
 
-Users = Backbone.Collection.extend({
-  model: User
+Users = BaseCollection.extend({
+  model: function ( attributes, options ) {
+    return User.create( attributes, options );
+  }
 });
 
 

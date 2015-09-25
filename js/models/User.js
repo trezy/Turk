@@ -1,16 +1,17 @@
-var Backbone, User;
+var _, BaseModel, User;
 
 
 
 
 
-Backbone = require( 'backbone' );
+_ = require( 'underscore' );
+BaseModel = require( 'models/Base' );
 
 
 
 
 
-User = Backbone.Model.extend({
+User = BaseModel.extend({
   defaults: {
     nickname: null,
     operator: false

@@ -1,10 +1,10 @@
-var Channel, Backbone, MessagesCollection, UsersCollection;
+var Channel, BaseModel, MessagesCollection, UsersCollection;
 
 
 
 
 
-Backbone = require( 'backbone' );
+BaseModel = require( 'models/Base' );
 MessagesCollection = require( 'collections/Messages' );
 UsersCollection = require( 'collections/Users' );
 
@@ -12,7 +12,7 @@ UsersCollection = require( 'collections/Users' );
 
 
 
-Channel = Backbone.Model.extend({
+Channel = BaseModel.extend({
   defaults: {
     joined: false,
     messages: null,

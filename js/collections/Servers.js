@@ -1,20 +1,20 @@
-var Backbone, Servers, Server;
+var BaseCollection, Servers, Server;
 
 
 
 
 
-Backbone = require( 'backbone' );
+BaseCollection = require( 'collections/Base' );
 Server = require( 'models/Server' );
 
 
 
 
 
-Servers = Backbone.Collection.extend({
-  model: Server,
-
-  initialize: function () {}
+Servers = BaseCollection.extend({
+  model: function ( attributes, options ) {
+    return Server.create( attributes, options );
+  }
 });
 
 

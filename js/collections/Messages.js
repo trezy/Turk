@@ -1,18 +1,20 @@
-var Backbone, Messages, Message;
+var BaseCollection, Messages, Message;
 
 
 
 
 
-Backbone = require( 'backbone' );
+BaseCollection = require( 'collections/Base' );
 Message = require( 'models/Message' );
 
 
 
 
 
-Messages = Backbone.Collection.extend({
-  model: Message
+Messages = BaseCollection.extend({
+  model: function ( attributes, options ) {
+    return Message.create( attributes, options );
+  }
 });
 
 

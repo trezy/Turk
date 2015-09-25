@@ -1,18 +1,20 @@
-var Backbone, Channels, Channel;
+var BaseCollection, Channels, Channel;
 
 
 
 
 
-Backbone = require( 'backbone' );
+BaseCollection = require( 'collections/Base' );
 Channel = require( 'models/Channel' );
 
 
 
 
 
-Channels = Backbone.Collection.extend({
-  model: Channel
+Channels = BaseCollection.extend({
+  model: function ( attributes, options ) {
+    return Channel.create( attributes, options );
+  }
 });
 
 
