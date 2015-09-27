@@ -31,16 +31,20 @@ module.exports = {
   ],
 
   dist: [
-    'clean:dist',
+    'clean:app',
     'copy:dist',
     'uglify:dist',
     'cssmin:dist',
     'shell:installProductionModules',
 
-    'clean:builds',
+    'clean:packages',
     'shell:packageWin',
     'shell:packageOSX',
+
+    'clean:builds',
     'shell:buildWin',
-    'shell:buildOSX'
+    'shell:buildOSX',
+    'clean:app',
+    'clean:packages'
   ]
 }

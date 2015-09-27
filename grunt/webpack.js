@@ -29,6 +29,8 @@ module.exports = {
         backbone: __dirname + '/../node_modules/backbone',
 
         collections: __dirname + '/../js/collections',
+        config: __dirname + '/../config',
+        data: __dirname + '/../data',
         models: __dirname + '/../js/models',
         routes: __dirname + '/../js/routes',
         shims: __dirname + '/../js/shims',

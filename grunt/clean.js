@@ -1,7 +1,9 @@
 module.exports = {
+  app: 'app',
+
   builds: 'builds',
 
   css: 'css',
 
-  dist: 'app'
+  packages: 'packages'
 }
