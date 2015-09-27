@@ -33,6 +33,10 @@ Server = BaseModel.extend({
     self = this;
     client = this.get( 'client' );
 
+    this.listenTo( this.get( 'user' ), 'change', function () {
+      console.log( 'foo')
+    });
+
     client.addListener( 'join', function ( channelName, nickname ) {
       var channel, users;
 
@@ -125,10 +129,8 @@ Server = BaseModel.extend({
       var user;
 
       user = self.get( 'users' ).findWhere( { nickname: oldNickname } );
-      console.log( user );
 
       user.set( 'nickname', newNickname );
-      console.log( user );
     });
 
     client.addListener( 'part', function ( channelName, nickname, reason ) {

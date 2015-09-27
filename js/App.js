@@ -1,4 +1,4 @@
-var _, AddChannelView, AddServerView, App, Backbone, BackboneIntercept, ChatView, document, fs, Marionette, Menu, MenuItem, ServersCollection, ServerListView, UserListView, util;
+var _, AddChannelView, AddServerView, App, Backbone, BackboneIntercept, ChatView, defaultConfig, document, fs, Marionette, Menu, MenuItem, ServersCollection, ServerListView, UserListView, util;
 
 
 
@@ -23,12 +23,15 @@ ChatView = require( 'views/Chat' );
 ServerListView = require( 'views/ServerList' );
 UserListView = require( 'views/UserList' );
 
+defaultConfig = require( 'config' );
+
 
 
 
 
 App = Marionette.Application.extend({
   data: new Backbone.Model({
+    config: null,
     currentChannel: null,
     currentServer: null,
     servers: new ServersCollection
@@ -159,46 +162,75 @@ App = Marionette.Application.extend({
     }), 1);
 
     menus.file.append( new gui.MenuItem( { label: 'Preferences' } ) );
-
-    //serverKeys = Object.keys( this.servers );
-
-    //for ( var i = 0; i < serverKeys.length; i++ ) {
-    //  var serverName, submenu;
-
-    //  serverName = serverKeys[i];
-
-    //  submenu = new gui.Menu();
-    //  submenu.append( new gui.MenuItem( { label: 'Add Channel' }, function () {} ) );
-    //  submenu.append( new gui.MenuItem( { type: 'separator' }, function () {} ) );
-    //  submenu.append( new gui.MenuItem( { label: 'Disconnect' }, function () {} ) );
-    //  submenu.append( new gui.MenuItem( { label: 'Delete' }, function () {} ) );
-
-    //  menus.servers.append( new gui.MenuItem({
-    //    label: serverName,
-    //    submenu: submenu
-    //  }));
-    //}
   },
 
   initialize: function ( config ) {
+    this.loadPreferences();
+  },
+
+  loadPreferences: function () {
+    var config;
+
+    this.data.set( 'config', JSON.parse( localStorage.getItem( 'config' ) ) || defaultConfig );
+  },
+
+  onStart: function () {
+    var config, servers;
+
+    config = this.data.get( 'config' )
+    servers = this.data.get( 'servers' )
+
+    this.bindEvents();
+    //this.buildMenu();
+
     for ( var i = 0; i < config.servers.length; i++ ) {
       var server;
 
       server = config.servers[i];
 
-      this.data.get( 'servers' ).add( server, { parse: true } );
+      servers.add( server, { parse: true } );
     }
-  },
 
-  onStart: function () {
-    this.bindEvents();
-    //this.buildMenu();
-
-    this.data.set( 'currentServer', this.data.get( 'servers' ).models[0] )
-    this.data.set( 'currentChannel', this.data.get( 'currentServer' ).get( 'channels' ).models[0] )
+    this.data.set( 'currentServer', servers.models[0] )
+    this.data.set( 'currentChannel', this.data.get( 'currentServer' ).get( 'channels' ).first() )
 
     Backbone.history.start( { pushState: true } );
     BackboneIntercept.start();
+  },
+
+  savePreferences: function () {
+    var newConfig, servers;
+
+    newConfig = {
+      servers: []
+    };
+
+    servers = this.data.get( 'servers' );
+
+    servers.each( function ( server, index, collection ) {
+      var channels, serverConfig;
+
+      channels = server.get( 'channels' );
+      serverConfig = {
+        address: server.get( 'address' ),
+        autoconnect: server.get( 'autoconnect' ),
+        channels: [],
+        name: server.get( 'name' ),
+        user: {
+          nickname: server.get( 'user' ).get( 'nickname' )
+        }
+      };
+
+      channels.each( function ( channel, index, collection ) {
+        serverConfig.channels.push({
+          name: channel.get( 'name' )
+        });
+      });
+
+      newConfig.servers.push( serverConfig );
+    });
+
+    localStorage.setItem( 'config', JSON.stringify( newConfig ) );
   },
 
   sendMessage: function ( message ) {

@@ -1,9 +1,10 @@
-var Channel, BaseModel, MessagesCollection, UsersCollection;
+var _, BaseModel, Channel, MessagesCollection, UsersCollection;
 
 
 
 
 
+_ = require( 'underscore' );
 BaseModel = require( 'models/Base' );
 MessagesCollection = require( 'collections/Messages' );
 UsersCollection = require( 'collections/Users' );
