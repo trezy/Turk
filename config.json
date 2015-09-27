@@ -5,23 +5,10 @@
       "autoconnect": true,
       "channels": [
         {
-          "name": "#trezy"
-        },
-        {
-          "name": "#trezy2"
+          "name": "#Turk"
         }
       ],
       "name": "Mibbit",
-      "user": {
-        "nickname": "Turk_Guest"
-      }
-    },
-
-    {
-      "address": "chat.freenode.net",
-      "autoconnect": true,
-      "channels": [],
-      "name": "Freenode",
       "user": {
         "nickname": "Turk_Guest"
       }
