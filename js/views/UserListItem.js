@@ -16,7 +16,7 @@ UserListItem = Marionette.LayoutView.extend({
 
   tagName: 'li',
 
-  className: 'user-list-item'
+  className: 'user-list-item fade-in'
 });
 
 
