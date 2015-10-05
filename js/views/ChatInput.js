@@ -62,7 +62,6 @@ chatInput = Marionette.LayoutView.extend({
   parseInput: function ( event ) {
     var target;
 
-    console.log( 'foo' )
     keycode = event.which;
     input = event.target.value;
 
