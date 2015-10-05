@@ -43,15 +43,8 @@ App = Marionette.Application.extend({
     self = this;
 
     this.listenTo( this.data, 'change:currentChannel', function ( model ) {
-      var chatListView, chatView, serverListView, userListView;
-
-      chatView = new ChatView;
-      serverListView = new ServerListView( { collection: self.data.get( 'servers' ) } );
-      userListView = new UserListView( { collection: self.data.get( 'currentChannel' ).get( 'users' ) } );
-
-      self.main.show( chatView, { replaceElement: true } );
-      self.servers.show( serverListView );
-      self.users.show( userListView );
+      self.main.show( new ChatView, { replaceElement: true } );
+      self.users.show( new UserListView( { collection: self.data.get( 'currentChannel' ).get( 'users' ) } ) );
     });
 
     window.addEventListener( 'contextmenu', function ( event ) {
@@ -125,15 +118,13 @@ App = Marionette.Application.extend({
     });
 
     window.addEventListener( 'hashchange', function () {
-      var channel, hash, server;
+      var hash;
 
       hash = location.hash.substring( 2 ).split( '/' );
       self.data.set( 'currentServer', self.data.get( 'servers' ).findWhere( { name: hash[0] } ) );
 
-      server = self.data.get( 'currentServer' );
-
       if ( hash.length === 2 ) {
-        self.data.set( 'currentChannel', server.get( 'channels' ).findWhere( { name: '#' + hash[1] } ) );
+        self.changeChannel( '#' + hash[1] );
       }
     });
   },
@@ -164,6 +155,16 @@ App = Marionette.Application.extend({
     menus.file.append( new gui.MenuItem( { label: 'Preferences' } ) );
   },
 
+  changeChannel: function ( channel ) {
+    if ( typeof channel === 'string' ) {
+      channel = this.data.get( 'currentServer' ).get( 'channels' ).findWhere( { name: channel } );
+    }
+
+    this.data.set( 'currentChannel', channel );
+
+    channel.set( 'unread', false );
+  },
+
   initialize: function ( config ) {
     this.loadPreferences();
   },
@@ -175,12 +176,11 @@ App = Marionette.Application.extend({
   },
 
   onStart: function () {
-    var config, servers;
+    var chatListView, chatView, config, serverListView, servers, userListView;
 
     config = this.data.get( 'config' )
     servers = this.data.get( 'servers' )
 
-    this.bindEvents();
     //this.buildMenu();
 
     for ( var i = 0; i < config.servers.length; i++ ) {
@@ -191,8 +191,14 @@ App = Marionette.Application.extend({
       servers.add( server, { parse: true } );
     }
 
-    this.data.set( 'currentServer', servers.models[0] )
+    this.data.set( 'currentServer', servers.first() )
     this.data.set( 'currentChannel', this.data.get( 'currentServer' ).get( 'channels' ).first() )
+
+    this.main.show( new ChatView, { replaceElement: true } );
+    this.servers.show( new ServerListView( { collection: this.data.get( 'servers' ) } ) );
+    this.users.show( new UserListView( { collection: this.data.get( 'currentChannel' ).get( 'users' ) } ) );
+
+    this.bindEvents();
 
     Backbone.history.start( { pushState: true } );
     BackboneIntercept.start();
