@@ -3,8 +3,33 @@
   padding: 1rem $default-gutter;
 
   .user {}
+  .message {}
 
-  .message {
-    color: $white;
+  &.system-message {
+    .user {
+      display: none;
+    }
+
+    .message {
+      color: $grey;
+    }
+  }
+
+  &.user-action {
+    .user {
+      text-align: right;
+    }
+
+    .message {
+      color: inherit;
+    }
+  }
+
+  &.user-message {
+    .user {}
+
+    .message {
+      color: $white;
+    }
   }
 }

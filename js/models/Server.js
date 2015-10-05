@@ -37,11 +37,26 @@ Server = BaseModel.extend({
       console.log( 'foo')
     });
 
+    client.addListener( 'action', function ( nickname, channelName, message ) {
+      var channel, user;
+
+      channel = self.get( 'channels' ).findWhere( { name: channelName } );
+      user = channel.get( 'users' ).findWhere( { nickname: nickname } );
+      messages = channel.get( 'messages' );
+
+      messages.add({
+        user: user,
+        message: message,
+        type: 'user-action'
+      });
+    });
+
     client.addListener( 'join', function ( channelName, nickname ) {
       var channel, users;
 
       channel = self.get( 'channels' ).findWhere( { name: channelName } );
       users = channel.get( 'users' );
+      messages = channel.get( 'messages' );
 
       if ( self.get( 'user' ).get( 'nickname' ) === nickname ) {
         channel.set( 'joined', true );
@@ -49,6 +64,11 @@ Server = BaseModel.extend({
       } else {
         users.add( { nickname: nickname }, { merge: true } );
       }
+
+      messages.add({
+        message: nickname + ' has joined the channel',
+        type: 'system-message'
+      });
     });
 
     client.addListener( 'error', function ( message ) {
@@ -125,8 +145,16 @@ Server = BaseModel.extend({
       }
     });
 
-    client.addListener( 'nick', function ( oldNickname, newNickname ) {
+    client.addListener( 'nick', function ( oldNickname, newNickname, channels ) {
       var user;
+
+      for ( var i = 0; i < channels.length; i++ ) {
+        var channelName;
+
+        channelName = channels[i];
+
+        console.log( self.get( 'channels' ) ) //.findWhere( { name: channelName } ) );
+      }
 
       user = self.get( 'users' ).findWhere( { nickname: oldNickname } );
 
@@ -141,6 +169,11 @@ Server = BaseModel.extend({
       user = users.findWhere( { nickname: nickname } );
 
       users.remove( user );
+
+      messages.add({
+        message: nickname + ' has left the channel',
+        type: 'system-message'
+      });
     });
 
     client.addListener( 'quit', function ( nickname, reason, channelNames ) {

@@ -13,7 +13,8 @@ BaseModel = require( 'models/Base' );
 Message = BaseModel.extend({
   defaults: {
     user: null,
-    message: null
+    message: null,
+    type: 'user-message'
   }
 });
 
