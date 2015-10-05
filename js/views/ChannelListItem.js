@@ -16,7 +16,11 @@ ChannelListItem = Marionette.LayoutView.extend({
 
   tagName: 'li',
 
-  className: 'channel-list-item fade-in'
+  className: 'channel-list-item',
+
+  initialize: function () {
+    //console.log( this.model );
+  }
 });
 
 
