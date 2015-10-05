@@ -2,7 +2,11 @@
   align-items: center;
   display: flex;
 
-  p {
-    word-break: break-all;
+  .new-message-notification {
+    display: none;
+  }
+
+  &.unread .new-message-notification {
+    display: inline-block;
   }
 }
