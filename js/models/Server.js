@@ -125,24 +125,31 @@ Server = BaseModel.extend({
     });
 
     client.addListener( 'names', function ( channelName, nicknames ) {
-      var channel, nicknamesArray, nicknameKeys;
+      var channel, currentUser, nicknamesArray, nicknameKeys, users;
 
       channel = self.get( 'channels' ).findWhere( { name: channelName } );
+      currentUser = self.get( 'user' );
       nicknamesArray = [];
       nicknameKeys = Object.keys( nicknames );
+      users = self.get( 'users' );
 
       for ( var i = 0; i < nicknameKeys.length; i++ ) {
         var nickname, opStatus, user;
 
         nickname = nicknameKeys[i];
         opStatus = nicknames[nickname];
-        user = self.get( 'users' ).findWhere( { nickname: nickname } );
+        user = users.findWhere( { nickname: nickname } );
 
         if ( !user ) {
-          user = self.get( 'users' ).add({
-            nickname: nickname,
-            operator: opStatus
-          });
+          if ( currentUser.get( 'nickname' ) === nickname ) {
+            user = users.add( currentUser );
+
+          } else {
+            user = users.add({
+              nickname: nickname,
+              operator: opStatus
+            });
+          }
         }
 
         'Channel User:', channel.get( 'users' ).add( user );
@@ -155,6 +162,11 @@ Server = BaseModel.extend({
       user = self.get( 'users' ).findWhere( { nickname: oldNickname } );
 
       user.set( 'nickname', newNickname );
+
+      messages.add({
+        message: oldNickname + ' is now known as ' + newNickname,
+        type: 'system-message'
+      });
     });
 
     client.addListener( 'part', function ( channelName, nickname, reason ) {

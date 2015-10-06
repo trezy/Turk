@@ -16,7 +16,15 @@ UserListItem = Marionette.LayoutView.extend({
 
   tagName: 'li',
 
-  className: 'user-list-item fade-in'
+  className: 'user-list-item fade-in',
+
+  bindings: {
+    '.user': 'nickname'
+  },
+
+  onShow: function () {
+    this.stickit();
+  }
 });
 
 
