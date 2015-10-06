@@ -116,7 +116,7 @@ Server = BaseModel.extend({
       });
 
       if ( channel !== app.data.get( 'currentChannel' ) ) {
-        channel.set( 'unread', true );
+        channel.set( 'unread', channel.get( 'unread' ) + 1 );
       }
     });
 
@@ -151,14 +151,6 @@ Server = BaseModel.extend({
 
     client.addListener( 'nick', function ( oldNickname, newNickname, channels ) {
       var user;
-
-      for ( var i = 0; i < channels.length; i++ ) {
-        var channelName;
-
-        channelName = channels[i];
-
-        console.log( self.get( 'channels' ) ) //.findWhere( { name: channelName } ) );
-      }
 
       user = self.get( 'users' ).findWhere( { nickname: oldNickname } );
 

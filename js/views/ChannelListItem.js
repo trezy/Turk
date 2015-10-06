@@ -18,18 +18,18 @@ ChannelListItem = Marionette.LayoutView.extend({
 
   className: 'channel-list-item',
 
-  bindEvents: function () {
-    this.listenTo( this.model, 'change:unread', function ( model, value ) {
-      if ( value ) {
-        this.$el.addClass( 'unread' );
-      } else {
-        this.$el.removeClass( 'unread' );
-      }
-    });
+  bindings: {
+    '#notification': 'unread'
   },
+
+  bindEvents: function () {},
 
   initialize: function () {
     this.bindEvents();
+  },
+
+  onShow: function () {
+    this.stickit();
   }
 });
 

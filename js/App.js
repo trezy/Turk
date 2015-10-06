@@ -10,6 +10,7 @@ util = require( 'util' );
 Backbone = require( 'backbone' );
 Marionette = require( 'backbone.marionette' );
 BackboneIntercept = require( 'backbone.intercept' );
+require( 'backbone.stickit' );
 require( 'shims/marionette.replaceElement' );
 
 Menu = Remote.require( 'menu' );
@@ -162,7 +163,7 @@ App = Marionette.Application.extend({
 
     this.data.set( 'currentChannel', channel );
 
-    channel.set( 'unread', false );
+    channel.set( 'unread', 0 );
   },
 
   initialize: function ( config ) {
