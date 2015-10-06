@@ -13,13 +13,10 @@ button, .button {
   display: inline-block;
   font-family: inherit;
   font-size: inherit;
-  overflow: hidden;
   padding: 1rem;
   text-align: left;
   text-decoration: none;
-  text-overflow: ellipsis;
   vertical-align: middle;
-  white-space: nowrap;
 
   &:hover {
     background-color: rgba( $orange, 1 );

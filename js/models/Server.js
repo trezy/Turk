@@ -33,10 +33,6 @@ Server = BaseModel.extend({
     self = this;
     client = this.get( 'client' );
 
-    this.listenTo( this.get( 'user' ), 'change', function () {
-      console.log( 'foo')
-    });
-
     client.addListener( 'action', function ( nickname, channelName, message ) {
       var channel, user;
 

@@ -19,13 +19,11 @@ ChannelListItem = Marionette.LayoutView.extend({
   className: 'channel-list-item',
 
   bindings: {
-    '#notification': 'unread'
-  },
-
-  bindEvents: function () {},
-
-  initialize: function () {
-    this.bindEvents();
+    '#notification': {
+      observe: 'unread',
+      updateView : true,
+      visible: true
+    }
   },
 
   onShow: function () {

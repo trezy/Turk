@@ -18,10 +18,6 @@ ChatListItem = Marionette.LayoutView.extend({
 
   className: 'chat-list-item',
 
-  bindings: {
-    '.user': 'user'
-  },
-
   initialize: function () {
     this.$el.addClass( this.model.get( 'type' ) );
   },
