@@ -1,2 +1,6 @@
-<a class="button" data-server="{{ name }}" href="#/{{ name }}">{{ name }}</a>
+<input type="checkbox" class="hidden" id="server-list-{{ name }}">
+<label for="server-list-{{ name }}" class="button server" data-server="{{ name }}">
+  {{ name }}
+  <i class="fa fa-fw fa-server"></i>
+</label><!-- href="#/{{ name }}" -->
 <ol class="channel-list"></ol>

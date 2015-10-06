@@ -1,0 +1,41 @@
+.server-list-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .server {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+  }
+
+  .channel-list {
+    border-bottom-width: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition-delay: 0s, 1s;
+    transition-duration: 1s, 0s;
+    transition-property: max-height, border-bottom-width;
+  }
+
+  [id^='server-list-']:checked ~ {
+    .server {
+      background-color: $orange;
+      color: $black;
+      transition-duration: 0.2s;
+      transition-property: background-color, color;
+    }
+
+    .channel-list {
+      border-bottom-width: 1px;
+      max-height: 50rem;
+      transition-delay: 0s, 0s;
+      transition-duration: 1s, 0s;
+      transition-property: max-height, border-bottom-width;
+    }
+  }
+}

@@ -22,6 +22,7 @@ Channel = BaseModel.extend({
     server: null,
     serverName: null,
     topic: null,
+    unread: false,
     users: null
   },
 

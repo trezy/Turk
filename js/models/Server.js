@@ -103,10 +103,6 @@ Server = BaseModel.extend({
       }
     });
 
-    client.addListener( 'motd', function ( motd ) {
-      self.set( 'motd', motd );
-    });
-
     client.addListener( 'message', function ( nickname, channelName, message ) {
       var channel, user;
 
@@ -118,6 +114,14 @@ Server = BaseModel.extend({
         user: user,
         message: message
       });
+
+      if ( channel !== app.data.get( 'currentChannel' ) ) {
+        channel.set( 'unread', true );
+      }
+    });
+
+    client.addListener( 'motd', function ( motd ) {
+      self.set( 'motd', motd );
     });
 
     client.addListener( 'names', function ( channelName, nicknames ) {
