@@ -23,7 +23,6 @@ ChatListItem = Marionette.LayoutView.extend({
   },
 
   onShow: function () {
-    console.log( this.model.get( 'user' ) )
     this.addBinding( this.model.get( 'user' ), '.user', 'nickname' );
   }
 });
